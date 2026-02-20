@@ -1,0 +1,146 @@
+---
+name: together-embeddings
+description: Generate text embeddings and rerank documents via Together AI. Embedding models include BGE, GTE, E5, UAE families. Reranking via MixedBread reranker. Use when users need text embeddings, vector search, semantic similarity, document reranking, RAG pipeline components, or retrieval-augmented generation.
+---
+
+# Together Embeddings & Reranking
+
+## Overview
+
+Generate vector embeddings for text and rerank documents by relevance.
+
+- Embeddings endpoint: `/v1/embeddings`
+- Rerank endpoint: `/v1/rerank`
+
+## Embeddings
+
+### Generate Embeddings
+
+```python
+from together import Together
+client = Together()
+
+response = client.embeddings.create(
+    model="BAAI/bge-large-en-v1.5",
+    input="What is the meaning of life?",
+)
+print(response.data[0].embedding[:5])  # First 5 dimensions
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.embeddings.create({
+  model: "BAAI/bge-large-en-v1.5",
+  input: "What is the meaning of life?",
+});
+console.log(response.data[0].embedding.slice(0, 5));
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/embeddings" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"BAAI/bge-large-en-v1.5","input":"What is the meaning of life?"}'
+```
+
+### Batch Embeddings
+
+```python
+texts = ["First document", "Second document", "Third document"]
+response = client.embeddings.create(
+    model="BAAI/bge-large-en-v1.5",
+    input=texts,
+)
+for i, item in enumerate(response.data):
+    print(f"Text {i}: {len(item.embedding)} dimensions")
+```
+
+### Embedding Models
+
+| Model | API String | Dimensions | Max Input |
+|-------|-----------|------------|-----------|
+| BGE Large EN v1.5 | `BAAI/bge-large-en-v1.5` | 1024 | 512 tokens |
+| BGE Base EN v1.5 | `BAAI/bge-base-en-v1.5` | 768 | 512 tokens |
+| E5 Mistral 7B | `intfloat/e5-mistral-7b-instruct` | 4096 | 32768 tokens |
+| GTE Large | `thenlper/gte-large` | 1024 | 512 tokens |
+| UAE Large v1 | `WhereIsAI/UAE-Large-V1` | 1024 | 512 tokens |
+| M2 BERT 80M | `togethercomputer/m2-bert-80M-8k-retrieval` | 768 | 8192 tokens |
+| M2 BERT 32K | `togethercomputer/m2-bert-80M-32k-retrieval` | 768 | 32768 tokens |
+
+## Reranking
+
+Rerank a set of documents by relevance to a query:
+
+```python
+response = client.rerank.create(
+    model="Salesforce/Llama-Rank-V1",
+    query="What is the capital of France?",
+    documents=[
+        "Paris is the capital of France.",
+        "Berlin is the capital of Germany.",
+        "London is the capital of England.",
+        "The Eiffel Tower is in Paris.",
+    ],
+)
+for result in response.results:
+    print(f"Index: {result.index}, Score: {result.relevance_score:.4f}")
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/rerank" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Salesforce/Llama-Rank-V1",
+    "query": "What is the capital of France?",
+    "documents": ["Paris is the capital of France.", "Berlin is the capital of Germany."]
+  }'
+```
+
+### Rerank Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `model` | string | Rerank model (required) |
+| `query` | string | Search query (required) |
+| `documents` | string[] | Documents to rerank (required) |
+| `top_n` | int | Return top N results |
+| `return_documents` | bool | Include document text in response |
+
+## RAG Pipeline Pattern
+
+```python
+# 1. Generate query embedding
+query_embedding = client.embeddings.create(
+    model="BAAI/bge-large-en-v1.5",
+    input="How does photosynthesis work?",
+).data[0].embedding
+
+# 2. Retrieve candidates from vector DB (your code)
+candidates = vector_db.search(query_embedding, top_k=20)
+
+# 3. Rerank for precision
+reranked = client.rerank.create(
+    model="Salesforce/Llama-Rank-V1",
+    query="How does photosynthesis work?",
+    documents=[c.text for c in candidates],
+    top_n=5,
+)
+
+# 4. Use top results as context for LLM
+context = "\n".join([candidates[r.index].text for r in reranked.results])
+response = client.chat.completions.create(
+    model="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    messages=[
+        {"role": "system", "content": f"Answer based on this context:\n{context}"},
+        {"role": "user", "content": "How does photosynthesis work?"},
+    ],
+)
+```
+
+## Resources
+
+- **Model details**: See [references/models.md](references/models.md)
+- **Runnable script**: See [scripts/embed_and_rerank.py](scripts/embed_and_rerank.py) — embed, compute similarity, and rerank pipeline (v2 SDK)
