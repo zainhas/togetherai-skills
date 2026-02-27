@@ -127,3 +127,6 @@ Notes:
 - **Supported models**: See [references/models.md](references/models.md)
 - **API parameter details**: See [references/api-reference.md](references/api-reference.md)
 - **Runnable script**: See [scripts/generate_image.py](scripts/generate_image.py) — generate, save, and edit images with FLUX models (v2 SDK)
+- **Official docs**: [Images Overview](https://docs.together.ai/docs/images-overview)
+- **Official docs**: [FLUX Quickstart](https://docs.together.ai/docs/quickstart-flux)
+- **API reference**: [Image Generation API](https://docs.together.ai/reference/post-images-generations)

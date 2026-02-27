@@ -106,3 +106,5 @@ Create and monitor evaluations via the Together AI dashboard at [api.together.xy
 
 - **Full API reference**: See [references/api-reference.md](references/api-reference.md)
 - **Runnable script**: See [scripts/run_evaluation.py](scripts/run_evaluation.py) — classify evaluation with typed v2 SDK params
+- **Official docs**: [AI Evaluations](https://docs.together.ai/docs/ai-evaluations)
+- **API reference**: [Evaluations API](https://docs.together.ai/reference/create-evaluation)

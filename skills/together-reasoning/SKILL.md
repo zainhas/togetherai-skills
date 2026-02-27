@@ -127,3 +127,6 @@ response = client.chat.completions.create(
 ## Resources
 
 - **Model details**: See [references/models.md](references/models.md)
+- **Official docs**: [Reasoning Overview](https://docs.together.ai/docs/reasoning-overview)
+- **Official docs**: [DeepSeek R1](https://docs.together.ai/docs/deepseek-r1)
+- **API reference**: [Chat Completions API](https://docs.together.ai/reference/chat-completions)

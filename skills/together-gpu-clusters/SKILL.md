@@ -156,3 +156,6 @@ tcloud cluster health my-cluster
 
 - **tcloud CLI reference**: See [references/tcloud-cli.md](references/tcloud-cli.md)
 - **Cluster management details**: See [references/cluster-management.md](references/cluster-management.md)
+- **Official docs**: [GPU Clusters Overview](https://docs.together.ai/docs/gpu-clusters-overview)
+- **Official docs**: [GPU Clusters Quickstart](https://docs.together.ai/docs/gpu-clusters-quickstart)
+- **API reference**: [Clusters API](https://docs.together.ai/reference/clusters-create)

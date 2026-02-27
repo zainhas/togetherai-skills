@@ -146,3 +146,6 @@ response = client.chat.completions.create(
 - **All 6 calling patterns**: See [references/patterns.md](references/patterns.md)
 - **Structured output details**: See [references/structured-outputs.md](references/structured-outputs.md)
 - **Runnable script**: See [scripts/tool_call_loop.py](scripts/tool_call_loop.py) — complete tool call loop with parallel call handling (v2 SDK)
+- **Official docs**: [Function Calling](https://docs.together.ai/docs/function-calling)
+- **Official docs**: [JSON Mode](https://docs.together.ai/docs/json-mode)
+- **API reference**: [Chat Completions API](https://docs.together.ai/reference/chat-completions)

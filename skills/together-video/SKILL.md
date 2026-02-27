@@ -142,3 +142,5 @@ See [references/models.md](references/models.md) for the complete model table.
 
 - **Full model details**: See [references/models.md](references/models.md)
 - **Runnable script**: See [scripts/generate_video.py](scripts/generate_video.py) — async video generation with polling helper (v2 SDK)
+- **Official docs**: [Videos Overview](https://docs.together.ai/docs/videos-overview)
+- **API reference**: [Create Video API](https://docs.together.ai/reference/create-videos)

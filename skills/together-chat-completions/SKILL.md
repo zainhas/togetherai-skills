@@ -359,3 +359,7 @@ answer = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
 - **Full parameter reference**: See [references/api-parameters.md](references/api-parameters.md)
 - **Function calling patterns (detailed)**: See the `together-function-calling` skill for in-depth patterns and structured output model lists
 - **Reasoning model details**: See the `together-reasoning` skill for extended model info and Qwen3 thinking toggle
+- **Official docs**: [Chat Overview](https://docs.together.ai/docs/chat-overview)
+- **Official docs**: [Inference Parameters](https://docs.together.ai/docs/inference-parameters)
+- **Official docs**: [Serverless Models](https://docs.together.ai/docs/serverless-models)
+- **API reference**: [Chat Completions API](https://docs.together.ai/reference/chat-completions)

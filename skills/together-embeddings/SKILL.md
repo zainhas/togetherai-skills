@@ -144,3 +144,7 @@ response = client.chat.completions.create(
 
 - **Model details**: See [references/models.md](references/models.md)
 - **Runnable script**: See [scripts/embed_and_rerank.py](scripts/embed_and_rerank.py) — embed, compute similarity, and rerank pipeline (v2 SDK)
+- **Official docs**: [Embeddings Overview](https://docs.together.ai/docs/embeddings-overview)
+- **Official docs**: [Rerank Overview](https://docs.together.ai/docs/rerank-overview)
+- **API reference**: [Embeddings API](https://docs.together.ai/reference/embeddings)
+- **API reference**: [Rerank API](https://docs.together.ai/reference/rerank)

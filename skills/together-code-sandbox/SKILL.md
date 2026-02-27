@@ -98,3 +98,7 @@ Default recommendation: Nano for most workloads, Pico for simple code execution.
 - **Docker support**: Full Dev Container spec support
 - **FS persistence**: Git version control on VM filesystem
 - **Auto-hibernate**: Sandboxes hibernate when disconnected
+
+## Resources
+
+- **Official docs**: [Together Code Sandbox](https://docs.together.ai/docs/together-code-sandbox)

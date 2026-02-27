@@ -151,3 +151,7 @@ curl -X POST "https://api.together.xyz/v1/audio/transcriptions" \
 - **STT details**: See [references/stt-models.md](references/stt-models.md)
 - **TTS script**: See [scripts/tts_generate.py](scripts/tts_generate.py) — REST, streaming, and WebSocket TTS (v2 SDK)
 - **STT script**: See [scripts/stt_transcribe.py](scripts/stt_transcribe.py) — transcribe, translate, diarize with CLI flags (v2 SDK)
+- **Official docs**: [Text-to-Speech](https://docs.together.ai/docs/text-to-speech)
+- **Official docs**: [Speech-to-Text](https://docs.together.ai/docs/speech-to-text)
+- **API reference**: [TTS API](https://docs.together.ai/reference/audio-speech)
+- **API reference**: [STT API](https://docs.together.ai/reference/audio-transcriptions)

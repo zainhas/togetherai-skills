@@ -127,3 +127,5 @@ Charged per minute while the endpoint is running, even when idle. Stop the endpo
 - **Hardware configurations**: See [references/hardware-options.md](references/hardware-options.md)
 - **Full API reference**: See [references/api-reference.md](references/api-reference.md)
 - **Runnable script**: See [scripts/manage_endpoint.py](scripts/manage_endpoint.py) — create, monitor, use, stop/delete lifecycle (v2 SDK)
+- **Official docs**: [Dedicated Endpoints](https://docs.together.ai/docs/dedicated-endpoints)
+- **API reference**: [Endpoints API](https://docs.together.ai/reference/createendpoint)

@@ -119,3 +119,6 @@ For async workloads, use the Queue API for job submission with:
 - **Full Jig CLI reference**: See [references/jig-cli.md](references/jig-cli.md)
 - **Sprocket SDK reference**: See [references/sprocket-sdk.md](references/sprocket-sdk.md)
 - **App template**: See [scripts/sprocket_hello_world.py](scripts/sprocket_hello_world.py) — minimal Sprocket worker with pyproject.toml example
+- **Official docs**: [Dedicated Container Inference](https://docs.together.ai/docs/dedicated-container-inference)
+- **Official docs**: [Containers Quickstart](https://docs.together.ai/docs/containers-quickstart)
+- **API reference**: [Deployments API](https://docs.together.ai/reference/deployments-create)

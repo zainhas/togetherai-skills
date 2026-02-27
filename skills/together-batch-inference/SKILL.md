@@ -138,3 +138,5 @@ Check `error_file_id` for per-request failures:
 
 - **Full API reference**: See [references/api-reference.md](references/api-reference.md)
 - **Runnable script**: See [scripts/batch_workflow.py](scripts/batch_workflow.py) — complete upload → create → poll → download pipeline (v2 SDK)
+- **Official docs**: [Batch Inference](https://docs.together.ai/docs/batch-inference)
+- **API reference**: [Batch API](https://docs.together.ai/reference/batch-create)
