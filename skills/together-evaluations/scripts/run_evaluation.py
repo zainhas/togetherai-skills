@@ -40,7 +40,7 @@ def run_classify_evaluation():
             f.write(json.dumps(row) + "\n")
 
     # --- 2. Upload dataset ---
-    file_response = client.files.upload(file=data_path, purpose="fine-tune")
+    file_response = client.files.upload(file=data_path, purpose="eval")
     file_id = file_response.id
     print(f"Uploaded dataset: {file_id}")
 
@@ -67,13 +67,13 @@ def run_classify_evaluation():
 
     # --- 4. Poll for completion ---
     while True:
-        status = client.evals.status(evaluation.workflow_id)
-        current = status.status_updates[-1].status if status.status_updates else "unknown"
+        status = client.evals.retrieve(evaluation.workflow_id)
+        current = status.status
         print(f"  Status: {current}")
 
         if current == "completed":
             break
-        elif current == "failed":
+        elif current in ("failed", "error", "user_error"):
             print("Evaluation failed")
             return
 
@@ -82,11 +82,11 @@ def run_classify_evaluation():
     # --- 5. Get results ---
     result = client.evals.retrieve(evaluation.workflow_id)
     print(f"\nResults:")
-    print(f"  Label counts: {result.results.get('label_counts', {})}")
-    print(f"  Pass percentage: {result.results.get('pass_percentage', 0):.1f}%")
-
-    if result.results.get("result_file_id"):
-        print(f"  Full results file: {result.results['result_file_id']}")
+    if result.results:
+        print(f"  Label counts: {result.results.label_counts}")
+        print(f"  Pass percentage: {result.results.pass_percentage:.1f}%")
+        if hasattr(result.results, "result_file_id") and result.results.result_file_id:
+            print(f"  Full results file: {result.results.result_file_id}")
 
 
 if __name__ == "__main__":

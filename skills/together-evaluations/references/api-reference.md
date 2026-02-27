@@ -180,9 +180,9 @@ Your deployed dedicated endpoint (use endpoint ID).
 
 | Provider | Models |
 |----------|--------|
-| OpenAI | `openai/gpt-5`, `openai/gpt-5-mini`, `openai/gpt-4o`, `openai/gpt-4o-mini` |
-| Anthropic | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`, `anthropic/claude-opus-4-5` |
-| Google | `google/gemini-2.5-pro`, `google/gemini-2.5-flash`, `google/gemini-2.0-flash` |
+| OpenAI | `openai/gpt-5`, `openai/gpt-5-mini`, `openai/gpt-5-nano`, `openai/gpt-5.2`, `openai/gpt-5.2-pro`, `openai/gpt-5.2-chat-latest`, `openai/gpt-4.1`, `openai/gpt-4o`, `openai/gpt-4o-mini` |
+| Anthropic | `anthropic/claude-sonnet-4-5`, `anthropic/claude-haiku-4-5`, `anthropic/claude-opus-4-5`, `anthropic/claude-opus-4-1`, `anthropic/claude-opus-4-0`, `anthropic/claude-sonnet-4-0` |
+| Google | `google/gemini-2.5-pro`, `google/gemini-2.5-flash`, `google/gemini-2.5-flash-lite`, `google/gemini-2.0-flash`, `google/gemini-2.0-flash-lite`, `google/gemini-3-pro-preview` |
 
 ## Jinja2 Templates
 
@@ -200,7 +200,7 @@ Both `system_template` and `input_template` support Jinja2:
 Get full details of a specific evaluation job including parameters and results.
 
 ```python
-result = client.evaluation.retrieve(eval_id)
+result = client.evals.retrieve(eval_id)
 ```
 
 ```shell
@@ -232,7 +232,7 @@ Example response:
 Quick status check for an evaluation job.
 
 ```python
-status = client.evaluation.status(eval_id)
+status = client.evals.status(eval_id)
 ```
 
 ```shell
