@@ -2,6 +2,27 @@
 
 This repository contains 15 Claude Code skills for the Together AI platform. Each skill is a self-contained directory following the [Agent Skills specification](https://agentskills.io/specification).
 
+## Skill registry
+
+<skills>
+- **together-chat-completions**: Serverless chat and text completion inference via Together AI's OpenAI-compatible API. Access 100+ open-source models with pay-per-token pricing. Includes function calling (tool use), structured outputs (JSON mode, json_schema, regex), and reasoning models (DeepSeek R1, Qwen3 Thinking, Kimi K2). Use when building chat applications, text generation, multi-turn conversations, function calling, structured JSON outputs, reasoning/chain-of-thought, or any LLM inference task using Together AI.
+- **together-function-calling**: Implement function calling (tool use) and structured outputs (JSON mode, json_schema, regex) via Together AI. 6 calling patterns from simple to multi-turn. Use when users need function calling, tool use, structured JSON responses, schema-constrained outputs, agent tool integration, or programmatic LLM output parsing.
+- **together-reasoning**: Use reasoning and thinking models on Together AI including DeepSeek R1, DeepSeek V3.1, Kimi K2-Thinking, and Qwen3 with thinking mode. Models output chain-of-thought in think tags before answering. Adjustable reasoning effort (low/medium/high). Use when users need reasoning models, chain-of-thought, step-by-step thinking, math/code/logic problem solving, or adjustable reasoning depth.
+- **together-images**: Generate and edit images via Together AI's image generation API. Models include FLUX.1 (schnell/dev/pro), FLUX.2, Kontext (image editing with reference images), Seedream, Stable Diffusion, and more. Use when users want to generate images from text, edit existing images, create AI art, use LoRA adapters for custom styles, or work with any image generation task.
+- **together-video**: Generate videos from text and image prompts via Together AI. 15+ models including Veo 2/3, Sora 2, Kling 2.1, Hailuo 02, Seedance, PixVerse, Vidu. Supports text-to-video, image-to-video, keyframe control, and reference images. Use when users want to generate videos, create video content, animate images, or work with any video generation task.
+- **together-audio**: Text-to-speech (TTS) and speech-to-text (STT) via Together AI. TTS models include Orpheus, Kokoro, Cartesia Sonic, Rime, MiniMax with REST, streaming, and WebSocket support. STT models include Whisper and Voxtral. Use when users need voice synthesis, audio generation, speech recognition, transcription, TTS, STT, or real-time voice applications.
+- **together-embeddings**: Generate text embeddings and rerank documents via Together AI. Embedding models include BGE, GTE, E5, UAE families. Reranking via MixedBread reranker. Use when users need text embeddings, vector search, semantic similarity, document reranking, RAG pipeline components, or retrieval-augmented generation.
+- **together-fine-tuning**: Fine-tune open-source LLMs on Together AI with LoRA, Full fine-tuning, DPO preference tuning, VLM (vision-language) fine-tuning, and Bring Your Own Model (BYOM). Supports 30+ models including Llama, Qwen, DeepSeek, Gemma, Mistral. Use when users want to train, fine-tune, customize, adapt, or specialize language models on custom data.
+- **together-batch-inference**: Process large volumes of inference requests asynchronously at up to 50% lower cost via Together AI's Batch API. Supports up to 50K requests per batch, 100MB max file size. Use when users need batch processing, offline inference, bulk data classification, synthetic data generation, or cost-optimized large-scale LLM workloads.
+- **together-evaluations**: Evaluate LLM outputs using Together AI's LLM-as-a-Judge framework with Classify, Score, and Compare evaluation types. Supports Together models and external providers (OpenAI, Anthropic, Google) as judges. Use when users want to evaluate model quality, benchmark outputs, compare models A/B, grade responses, or assess LLM performance.
+- **together-code-interpreter**: Execute Python code in a sandboxed environment via Together Code Interpreter (TCI). $0.03 per session, 60-minute lifespan, stateful sessions with pre-installed data science packages. Use when users need to run Python code remotely, execute computations, data analysis, generate plots, RL training environments, or agentic code execution workflows.
+- **together-code-sandbox**: Spin up full VM sandboxes with Docker support via Together Code Sandbox (powered by CodeSandbox). Sizes from Pico (2 CPU, 1GB) to XLarge (64 CPU, 128GB). Memory snapshots, sub-3-second cloning, browser connectivity. Use when users need full VM environments, Docker containers, dev servers, persistent sandboxes, or compute environments beyond simple Python execution.
+- **together-dedicated-endpoints**: Deploy models on dedicated single-tenant GPU endpoints via Together AI for predictable performance, no rate limits, autoscaling, and custom hardware. Use when users need dedicated inference endpoints, always-on model hosting, production deployments with SLAs, or scaling beyond serverless limits.
+- **together-dedicated-containers**: Deploy custom Dockerized inference workloads on Together AI's managed GPU infrastructure using Dedicated Container Inference (DCI). Tools include Jig CLI for building/deploying, Sprocket SDK for request handling, and a private container registry. Use when users need custom model serving, containerized inference, Docker-based GPU workloads, or workloads beyond standard model endpoints.
+- **together-gpu-clusters**: Provision on-demand and reserved GPU clusters (Instant Clusters) on Together AI with H100, H200, and B200 hardware. Supports Kubernetes and Slurm orchestration, tcloud CLI, Terraform, and SkyPilot. Use when users need GPU clusters, distributed training, multi-node compute, HPC workloads, or large-scale ML infrastructure.
+
+</skills>
+
 ## Project structure
 
 ```
@@ -18,8 +39,6 @@ together-skills/
     └── scripts/                  # Optional — runnable Python examples
         └── <workflow>.py
 ```
-
-There are 15 skills covering: chat-completions, function-calling, reasoning, images, video, audio, embeddings, fine-tuning, batch-inference, evaluations, code-interpreter, code-sandbox, dedicated-endpoints, dedicated-containers, gpu-clusters.
 
 ## Working with skills
 
@@ -92,7 +111,7 @@ These are the correct v2 SDK method names. Do NOT use v1 patterns:
 Before committing changes, validate each modified skill:
 
 ```bash
-python quick_validate.py path/to/together-<skill>
+python scripts/quick_validate.py skills/together-<skill>
 ```
 
 The validator checks:
@@ -100,20 +119,16 @@ The validator checks:
 - `name` is present, kebab-case, max 64 chars
 - `description` is present, no angle brackets, max 1024 chars
 - No disallowed frontmatter keys
-
-If you don't have the validator script locally, check these rules manually:
-1. Frontmatter has `name` and `description`
-2. `name` matches the directory name
-3. `description` contains no `<` or `>` characters
-4. Body loads as valid Markdown
+- Referenced files in `references/` and `scripts/` exist
 
 ## Adding a new skill
 
-1. Create `together-<product>/SKILL.md` with frontmatter and body
+1. Create `skills/together-<product>/SKILL.md` with frontmatter and body
 2. Add `references/` files for detailed specs (model tables, API params)
 3. Add `scripts/` with runnable Python v2 SDK examples if the skill involves multi-step workflows
-4. Validate with `quick_validate.py`
-5. Update `README.md` skills table with the new entry
+4. Validate with `python scripts/quick_validate.py skills/together-<product>`
+5. Run `./scripts/publish.sh` to regenerate AGENTS.md and README.md
+6. Update `.claude-plugin/marketplace.json` with the new skill entry
 
 ## Modifying existing skills
 
@@ -131,7 +146,7 @@ Model tables live in `references/models.md` (or similar) within each skill. Upda
 
 ### Add a new script
 
-1. Create `together-<skill>/scripts/<descriptive_name>.py`
+1. Create `skills/together-<skill>/scripts/<descriptive_name>.py`
 2. Follow the script conventions above (docstring, `__main__`, type hints)
 3. Add a reference line to the `## Resources` section of the skill's `SKILL.md`:
    ```
