@@ -75,13 +75,13 @@ await sandbox.fs.writeTextFile('test.txt', 'Hello World');
 
 | VM Size | CPU | RAM | Cost/hour |
 |---------|-----|-----|-----------|
-| Pico | 2 cores | 1 GB | $0.074 |
-| Nano | 2 cores | 4 GB | $0.149 |
-| Micro | 4 cores | 8 GB | $0.297 |
-| Small | 8 cores | 16 GB | $0.594 |
-| Medium | 16 cores | 32 GB | $1.189 |
-| Large | 32 cores | 64 GB | $2.378 |
-| XLarge | 64 cores | 128 GB | $4.755 |
+| Pico | 2 cores | 1 GB | $0.0743 |
+| Nano | 2 cores | 4 GB | $0.1486 |
+| Micro | 4 cores | 8 GB | $0.2972 |
+| Small | 8 cores | 16 GB | $0.5944 |
+| Medium | 16 cores | 32 GB | $1.1888 |
+| Large | 32 cores | 64 GB | $2.3776 |
+| XLarge | 64 cores | 128 GB | $4.7552 |
 
 Default recommendation: Nano for most workloads, Pico for simple code execution.
 
