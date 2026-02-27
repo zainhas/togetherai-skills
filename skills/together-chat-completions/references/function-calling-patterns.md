@@ -10,12 +10,16 @@ Model picks one function and calls it once.
 tools = [{
     "type": "function",
     "function": {
-        "name": "get_weather",
-        "description": "Get current weather",
+        "name": "get_current_weather",
+        "description": "Get the current weather in a given location",
         "parameters": {
             "type": "object",
             "properties": {
-                "location": {"type": "string"},
+                "location": {
+                    "type": "string",
+                    "description": "The city and state, e.g. San Francisco, CA",
+                },
+                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
             },
         },
     },
@@ -24,14 +28,55 @@ tools = [{
 response = client.chat.completions.create(
     model="Qwen/Qwen2.5-7B-Instruct-Turbo",
     messages=[
-        {"role": "system", "content": "You can access external functions."},
-        {"role": "user", "content": "What's the weather in NYC?"},
+        {"role": "system", "content": "You are a helpful assistant that can access external functions."},
+        {"role": "user", "content": "What is the current temperature of New York?"},
     ],
     tools=tools,
 )
 
 tool_call = response.choices[0].message.tool_calls[0]
-# Execute: get_weather(location="New York, NY")
+# Execute: get_current_weather(location="New York, NY", unit="fahrenheit")
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.chat.completions.create({
+  model: "Qwen/Qwen2.5-7B-Instruct-Turbo",
+  messages: [
+    {
+      role: "system",
+      content: "You are a helpful assistant that can access external functions.",
+    },
+    { role: "user", content: "What is the current temperature of New York?" },
+  ],
+  tools: [
+    {
+      type: "function",
+      function: {
+        name: "getCurrentWeather",
+        description: "Get the current weather in a given location",
+        parameters: {
+          type: "object",
+          properties: {
+            location: {
+              type: "string",
+              description: "The city and state, e.g. San Francisco, CA",
+            },
+            unit: {
+              type: "string",
+              description: "The unit of temperature",
+              enum: ["celsius", "fahrenheit"],
+            },
+          },
+        },
+      },
+    },
+  ],
+});
+
+console.log(JSON.stringify(response.choices[0].message?.tool_calls, null, 2));
 ```
 
 ### 2. Multiple Functions — Model picks which to call
@@ -53,12 +98,36 @@ tools = [
 Model calls the same function multiple times in one turn.
 
 ```python
-# User: "What's the weather in NYC, SF, and Chicago?"
-# Model returns 3 tool_calls:
-#   get_weather(location="New York")
-#   get_weather(location="San Francisco")
-#   get_weather(location="Chicago")
+import json
+from together import Together
+client = Together()
 
+response = client.chat.completions.create(
+    model="Qwen/Qwen2.5-7B-Instruct-Turbo",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant that can access external functions."},
+        {"role": "user", "content": "What is the current temperature of New York, San Francisco and Chicago?"},
+    ],
+    tools=[{
+        "type": "function",
+        "function": {
+            "name": "get_current_weather",
+            "description": "Get the current weather in a given location",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "location": {"type": "string", "description": "The city and state, e.g. San Francisco, CA"},
+                    "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
+                },
+            },
+        },
+    }],
+)
+
+# Model returns 3 tool_calls:
+#   get_current_weather(location="New York, NY", unit="fahrenheit")
+#   get_current_weather(location="San Francisco, CA", unit="fahrenheit")
+#   get_current_weather(location="Chicago, IL", unit="fahrenheit")
 for tc in response.choices[0].message.tool_calls:
     result = execute_function(tc.function.name, tc.function.arguments)
     messages.append({
@@ -66,6 +135,51 @@ for tc in response.choices[0].message.tool_calls:
         "tool_call_id": tc.id,
         "content": json.dumps(result),
     })
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.chat.completions.create({
+  model: "Qwen/Qwen2.5-7B-Instruct-Turbo",
+  messages: [
+    {
+      role: "system",
+      content: "You are a helpful assistant that can access external functions.",
+    },
+    {
+      role: "user",
+      content: "What is the current temperature of New York, San Francisco and Chicago?",
+    },
+  ],
+  tools: [
+    {
+      type: "function",
+      function: {
+        name: "getCurrentWeather",
+        description: "Get the current weather in a given location",
+        parameters: {
+          type: "object",
+          properties: {
+            location: {
+              type: "string",
+              description: "The city and state, e.g. San Francisco, CA",
+            },
+            unit: {
+              type: "string",
+              description: "The unit of temperature",
+              enum: ["celsius", "fahrenheit"],
+            },
+          },
+        },
+      },
+    },
+  ],
+});
+
+// Model returns 3 tool_calls for NYC, SF, and Chicago
+console.log(JSON.stringify(response.choices[0].message?.tool_calls, null, 2));
 ```
 
 ### 4. Parallel Multiple — Different functions in one turn

@@ -35,6 +35,51 @@ Step-by-step reasoning here...
 Final answer here.
 ```
 
+## Reasoning Effort Examples
+
+### Python
+
+```python
+response = client.chat.completions.create(
+    model="deepseek-ai/DeepSeek-R1",
+    messages=[{"role": "user", "content": "Prove the infinitude of primes"}],
+    reasoning_effort="high",
+)
+```
+
+### TypeScript
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const stream = await together.chat.completions.create({
+  model: "deepseek-ai/DeepSeek-R1",
+  messages: [{ role: "user", content: "Prove the infinitude of primes" }],
+  reasoning_effort: "high",
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content || "");
+}
+```
+
+### cURL
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-R1",
+    "messages": [
+      {"role": "user", "content": "Prove the infinitude of primes"}
+    ],
+    "reasoning_effort": "high"
+  }'
+```
+
 ## Qwen3 Thinking Toggle
 
 **Thinking enabled:** Use the `-Thinking` model variant

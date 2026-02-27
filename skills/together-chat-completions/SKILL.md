@@ -62,6 +62,36 @@ for chunk in stream:
     print(chunk.choices[0].delta.content or "", end="", flush=True)
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const stream = await together.chat.completions.create({
+  model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+  messages: [
+    { role: "user", content: "What are some fun things to do in New York?" },
+  ],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content || "");
+}
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    "messages": [
+      {"role": "user", "content": "What are some fun things to do in New York?"}
+    ],
+    "stream": true
+  }'
+```
+
 ### Multi-Turn Conversation
 
 Pass conversation history in the `messages` array with alternating `user`/`assistant` roles:
@@ -182,12 +212,13 @@ client = Together()
 tools = [{
     "type": "function",
     "function": {
-        "name": "get_weather",
-        "description": "Get current weather in a location",
+        "name": "get_current_weather",
+        "description": "Get the current weather in a given location",
         "parameters": {
             "type": "object",
             "properties": {
-                "location": {"type": "string", "description": "City and state"},
+                "location": {"type": "string", "description": "The city and state, e.g. San Francisco, CA"},
+                "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]},
             },
         },
     },
@@ -196,8 +227,8 @@ tools = [{
 response = client.chat.completions.create(
     model="Qwen/Qwen2.5-7B-Instruct-Turbo",
     messages=[
-        {"role": "system", "content": "You can access external functions."},
-        {"role": "user", "content": "What's the weather in NYC?"},
+        {"role": "system", "content": "You are a helpful assistant that can access external functions."},
+        {"role": "user", "content": "What is the current temperature of New York?"},
     ],
     tools=tools,
 )
@@ -206,13 +237,95 @@ response = client.chat.completions.create(
 tool_calls = response.choices[0].message.tool_calls
 for tc in tool_calls:
     args = json.loads(tc.function.arguments)
-    result = get_weather(**args)  # your function
+    result = get_current_weather(**args)  # your function
 
     # Pass result back
     messages.append(response.choices[0].message)
     messages.append({"role": "tool", "tool_call_id": tc.id, "content": json.dumps(result)})
 
 final = client.chat.completions.create(model="Qwen/Qwen2.5-7B-Instruct-Turbo", messages=messages, tools=tools)
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.chat.completions.create({
+  model: "Qwen/Qwen2.5-7B-Instruct-Turbo",
+  messages: [
+    {
+      role: "system",
+      content: "You are a helpful assistant that can access external functions.",
+    },
+    { role: "user", content: "What is the current temperature of New York?" },
+  ],
+  tools: [
+    {
+      type: "function",
+      function: {
+        name: "getCurrentWeather",
+        description: "Get the current weather in a given location",
+        parameters: {
+          type: "object",
+          properties: {
+            location: {
+              type: "string",
+              description: "The city and state, e.g. San Francisco, CA",
+            },
+            unit: {
+              type: "string",
+              description: "The unit of temperature",
+              enum: ["celsius", "fahrenheit"],
+            },
+          },
+        },
+      },
+    },
+  ],
+});
+
+console.log(JSON.stringify(response.choices[0].message?.tool_calls, null, 2));
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen/Qwen2.5-7B-Instruct-Turbo",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant that can access external functions."
+      },
+      {
+        "role": "user",
+        "content": "What is the current temperature of New York?"
+      }
+    ],
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "get_current_weather",
+          "description": "Get the current weather in a given location",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "location": {
+                "type": "string",
+                "description": "The city and state, e.g. San Francisco, CA"
+              },
+              "unit": {
+                "type": "string",
+                "enum": ["celsius", "fahrenheit"]
+              }
+            }
+          }
+        }
+      }
+    ]
+  }'
 ```
 
 ### tool_choice Parameter
@@ -255,6 +368,37 @@ response = client.chat.completions.create(
     response_format={"type": "json_schema", "schema": VoiceNote.model_json_schema()},
 )
 result = VoiceNote.model_validate_json(response.choices[0].message.content)
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {
+        "role": "system",
+        "content": "The following is a voice message transcript. Only answer in JSON."
+      },
+      {
+        "role": "user",
+        "content": "Good morning! Today is going to be a busy day. First, I need to make a quick breakfast. While cooking, I will also check my emails."
+      }
+    ],
+    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    "response_format": {
+      "type": "json_schema",
+      "schema": {
+        "properties": {
+          "title": { "type": "string", "description": "A title for the voice note" },
+          "summary": { "type": "string", "description": "A short one sentence summary" },
+          "actionItems": { "items": { "type": "string" }, "type": "array", "description": "Action items" }
+        },
+        "required": ["title", "summary", "actionItems"],
+        "type": "object"
+      }
+    }
+  }'
 ```
 
 ### json_object (Simple)
@@ -302,6 +446,33 @@ for chunk in stream:
     print(chunk.choices[0].delta.content or "", end="", flush=True)
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const stream = await together.chat.completions.create({
+  model: "deepseek-ai/DeepSeek-R1",
+  messages: [{ role: "user", content: "Which number is bigger 9.9 or 9.11?" }],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content || "");
+}
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-R1",
+    "messages": [
+      {"role": "user", "content": "Which number is bigger 9.9 or 9.11?"}
+    ]
+  }'
+```
+
 Output:
 ```
 <think>
@@ -334,6 +505,35 @@ response = client.chat.completions.create(
     messages=[{"role": "user", "content": "Prove the infinitude of primes"}],
     reasoning_effort="high",
 )
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const stream = await together.chat.completions.create({
+  model: "deepseek-ai/DeepSeek-R1",
+  messages: [{ role: "user", content: "Prove the infinitude of primes" }],
+  reasoning_effort: "high",
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content || "");
+}
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-ai/DeepSeek-R1",
+    "messages": [
+      {"role": "user", "content": "Prove the infinitude of primes"}
+    ],
+    "reasoning_effort": "high"
+  }'
 ```
 
 ### Qwen3 Thinking Toggle

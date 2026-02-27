@@ -30,20 +30,65 @@ result = VoiceNote.model_validate_json(response.choices[0].message.content)
 
 **TypeScript:**
 ```typescript
+import Together from "together-ai";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 
-const schema = z.object({
-  title: z.string(),
-  summary: z.string(),
-  actionItems: z.array(z.string()),
+const together = new Together();
+
+const voiceNoteSchema = z.object({
+  title: z.string().describe("A title for the voice note"),
+  summary: z.string().describe("A short one sentence summary of the voice note."),
+  actionItems: z.array(z.string()).describe("A list of action items from the voice note"),
+});
+const jsonSchema = zodToJsonSchema(voiceNoteSchema, { target: "openAi" });
+
+const extract = await together.chat.completions.create({
+  messages: [
+    {
+      role: "system",
+      content: `The following is a voice message transcript. Only answer in JSON and follow this schema ${JSON.stringify(jsonSchema)}.`,
+    },
+    { role: "user", content: transcript },
+  ],
+  model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+  response_format: { type: "json_schema", schema: jsonSchema },
 });
 
-const response = await together.chat.completions.create({
-  model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
-  messages: [...],
-  response_format: { type: "json_schema", schema: zodToJsonSchema(schema, { target: "openAi" }) },
-});
+const output = JSON.parse(extract?.choices?.[0]?.message?.content);
+console.log(output);
+```
+
+**cURL:**
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [
+      {
+        "role": "system",
+        "content": "The following is a voice message transcript. Only answer in JSON."
+      },
+      {
+        "role": "user",
+        "content": "Good morning! Today is going to be a busy day. First, I need to make a quick breakfast. While cooking, I will also check my emails."
+      }
+    ],
+    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    "response_format": {
+      "type": "json_schema",
+      "schema": {
+        "properties": {
+          "title": { "type": "string", "description": "A title for the voice note" },
+          "summary": { "type": "string", "description": "A short one sentence summary" },
+          "actionItems": { "items": { "type": "string" }, "type": "array", "description": "Action items" }
+        },
+        "required": ["title", "summary", "actionItems"],
+        "type": "object"
+      }
+    }
+  }'
 ```
 
 ### 2. json_object (Simple)
@@ -59,6 +104,20 @@ response = client.chat.completions.create(
     ],
     response_format={"type": "json_object"},
 )
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    "messages": [
+      {"role": "system", "content": "Respond in JSON with keys: name, age, city"},
+      {"role": "user", "content": "Tell me about yourself"}
+    ],
+    "response_format": {"type": "json_object"}
+  }'
 ```
 
 ### 3. regex (Pattern Matching)
@@ -84,6 +143,52 @@ response_format={"type": "regex", "regex": r"\(\d{3}\) \d{3}-\d{4}"}
 
 # Email
 response_format={"type": "regex", "pattern": r"\w+@\w+\.com\n"}
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const completion = await together.chat.completions.create({
+  model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+  messages: [
+    {
+      role: "system",
+      content:
+        "You are an AI-powered expert specializing in classifying sentiment. Classify the text as positive, neutral, or negative.",
+    },
+    { role: "user", content: "Wow. I loved the movie!" },
+  ],
+  response_format: {
+    type: "regex",
+    // @ts-ignore
+    pattern: "(positive|neutral|negative)",
+  },
+});
+
+console.log(completion?.choices[0]?.message?.content);
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return only an email address for Alan Turing at Enigma. End with .com and newline."
+      }
+    ],
+    "stop": ["\n"],
+    "response_format": {
+      "type": "regex",
+      "pattern": "\\w+@\\w+\\.com\\n"
+    },
+    "temperature": 0.0,
+    "max_tokens": 50
+  }'
 ```
 
 ## Supported Models
