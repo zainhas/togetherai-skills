@@ -38,6 +38,16 @@ Each skill contains:
 
 ## Installation
 
+### Quick Install (Any Agent)
+
+Install all skills at once using [skills.sh](https://skills.sh/):
+
+```bash
+npx skills add togethercomputer/skills
+```
+
+This works with Claude Code, Cursor, Codex, and other agents that support the [Agent Skills](https://agentskills.io/specification) specification.
+
 ### Claude Code
 
 ```bash
