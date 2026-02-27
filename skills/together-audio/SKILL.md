@@ -144,15 +144,16 @@ async def generate_speech():
 
 ## TTS Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `model` | string | TTS model (required) |
-| `input` | string | Text to synthesize (required) |
-| `voice` | string | Voice ID (required) |
-| `response_format` | string | `mp3`, `wav`, `raw`, `mulaw` |
-| `stream` | bool | Enable streaming (raw format only) |
-| `response_encoding` | string | `pcm_s16le`, `pcm_f32le` for raw |
-| `sample_rate` | int | Audio sample rate (e.g., 44100) |
+| Parameter | Type | Description | Default |
+|-----------|------|-------------|---------|
+| `model` | string | TTS model (required) | - |
+| `input` | string | Text to synthesize (required) | - |
+| `voice` | string | Voice ID (required) | - |
+| `response_format` | string | `mp3`, `wav` (default), `raw`, `mulaw` | `wav` |
+| `stream` | bool | Enable streaming (raw format only) | false |
+| `response_encoding` | string | `pcm_f32le`, `pcm_s16le`, `pcm_mulaw`, `pcm_alaw` for raw | - |
+| `language` | string | Language of input text: en, de, fr, es, hi, it, ja, ko, nl, pl, pt, ru, sv, tr, zh | "en" |
+| `sample_rate` | int | Audio sample rate (e.g., 44100) | - |
 
 ### List Available Voices
 
@@ -203,7 +204,7 @@ curl -X POST "https://api.together.xyz/v1/audio/transcriptions" \
 | Model | API String |
 |-------|-----------|
 | Whisper Large v3 | `openai/whisper-large-v3` |
-| Whisper Large v3 Turbo | `openai/whisper-large-v3-turbo` |
+| Voxtral Mini 3B | `mistralai/Voxtral-Mini-3B-2507` |
 
 ## Delivery Method Guide
 
