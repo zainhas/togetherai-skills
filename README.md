@@ -1,6 +1,6 @@
 # Together AI Skills for Claude Code
 
-A collection of 15 Claude Code skills that provide comprehensive knowledge of the [Together AI](https://together.ai) platform — inference, training, embeddings, audio, video, images, function calling, and infrastructure.
+A collection of 13 Claude Code skills that provide comprehensive knowledge of the [Together AI](https://together.ai) platform — inference, training, embeddings, audio, video, images, function calling, and infrastructure.
 
 Each skill teaches Claude Code how to use a specific Together AI product, including API patterns, SDK usage, model selection, and best practices. Skills include runnable Python scripts using the **Together Python v2 SDK**.
 
@@ -19,9 +19,7 @@ Each skill contains:
 <!-- BEGIN_SKILLS_TABLE -->
 | Skill | Description | Scripts |
 |-------|-------------|---------|
-| **together-chat-completions** | Serverless chat and text completion inference via Together AI's OpenAI-compatible API. | — |
-| **together-function-calling** | Implement function calling (tool use) and structured outputs (JSON mode, json_schema, regex) via Together AI. | `tool_call_loop.py` |
-| **together-reasoning** | Use reasoning and thinking models on Together AI including DeepSeek R1, DeepSeek V3.1, Kimi K2-Thinking, and Qwen3 wi... | — |
+| **together-chat-completions** | Serverless chat and text completion inference via Together AI's OpenAI-compatible API. | `tool_call_loop.py` |
 | **together-images** | Generate and edit images via Together AI's image generation API. | `generate_image.py` |
 | **together-video** | Generate videos from text and image prompts via Together AI. | `generate_video.py` |
 | **together-audio** | Text-to-speech (TTS) and speech-to-text (STT) via Together AI. | `stt_transcribe.py`, `tts_generate.py` |
@@ -48,7 +46,6 @@ Install the full plugin or individual skills via the Claude Code plugin system:
 
 # Install individual skills
 /plugin install together-chat-completions@togethercomputer/skills
-/plugin install together-function-calling@togethercomputer/skills
 ```
 
 ### Claude Code (Manual)
@@ -64,7 +61,6 @@ cp -r skills/together-* ~/.claude/skills/
 
 # Or just the skills you need
 cp -r skills/together-chat-completions your-project/.claude/skills/
-cp -r skills/together-function-calling your-project/.claude/skills/
 ```
 
 ### Codex
@@ -115,7 +111,7 @@ Claude will use the `together-chat-completions` skill to generate correct v2 SDK
 > Create an agent that can check weather and stock prices using Together AI function calling
 ```
 
-Claude will reference `together-function-calling` for the complete tool call loop pattern, including parallel tool calls and tool_choice options.
+Claude will reference `together-chat-completions` for the complete tool call loop pattern, including parallel tool calls and tool_choice options.
 
 **Image generation** — Ask for image workflows:
 
