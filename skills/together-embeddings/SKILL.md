@@ -21,7 +21,7 @@ from together import Together
 client = Together()
 
 response = client.embeddings.create(
-    model="BAAI/bge-large-en-v1.5",
+    model="BAAI/bge-base-en-v1.5",
     input="What is the meaning of life?",
 )
 print(response.data[0].embedding[:5])  # First 5 dimensions
@@ -32,7 +32,7 @@ import Together from "together-ai";
 const together = new Together();
 
 const response = await together.embeddings.create({
-  model: "BAAI/bge-large-en-v1.5",
+  model: "BAAI/bge-base-en-v1.5",
   input: "What is the meaning of life?",
 });
 console.log(response.data[0].embedding.slice(0, 5));
@@ -42,7 +42,7 @@ console.log(response.data[0].embedding.slice(0, 5));
 curl -X POST "https://api.together.xyz/v1/embeddings" \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"BAAI/bge-large-en-v1.5","input":"What is the meaning of life?"}'
+  -d '{"model":"BAAI/bge-base-en-v1.5","input":"What is the meaning of life?"}'
 ```
 
 ### Batch Embeddings
@@ -50,7 +50,7 @@ curl -X POST "https://api.together.xyz/v1/embeddings" \
 ```python
 texts = ["First document", "Second document", "Third document"]
 response = client.embeddings.create(
-    model="BAAI/bge-large-en-v1.5",
+    model="BAAI/bge-base-en-v1.5",
     input=texts,
 )
 for i, item in enumerate(response.data):
@@ -62,7 +62,7 @@ import Together from "together-ai";
 const together = new Together();
 
 const response = await together.embeddings.create({
-  model: "BAAI/bge-large-en-v1.5",
+  model: "BAAI/bge-base-en-v1.5",
   input: [
     "First document",
     "Second document",
@@ -79,7 +79,7 @@ curl -X POST "https://api.together.xyz/v1/embeddings" \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "BAAI/bge-large-en-v1.5",
+    "model": "BAAI/bge-base-en-v1.5",
     "input": [
       "First document",
       "Second document",
@@ -92,13 +92,8 @@ curl -X POST "https://api.together.xyz/v1/embeddings" \
 
 | Model | API String | Dimensions | Max Input |
 |-------|-----------|------------|-----------|
-| BGE Large EN v1.5 | `BAAI/bge-large-en-v1.5` | 1024 | 512 tokens |
 | BGE Base EN v1.5 | `BAAI/bge-base-en-v1.5` | 768 | 512 tokens |
-| E5 Mistral 7B | `intfloat/e5-mistral-7b-instruct` | 4096 | 32768 tokens |
-| GTE Large | `thenlper/gte-large` | 1024 | 512 tokens |
-| UAE Large v1 | `WhereIsAI/UAE-Large-V1` | 1024 | 512 tokens |
-| M2 BERT 80M | `togethercomputer/m2-bert-80M-8k-retrieval` | 768 | 8192 tokens |
-| M2 BERT 32K | `togethercomputer/m2-bert-80M-32k-retrieval` | 768 | 32768 tokens |
+| Multilingual E5 Large | `intfloat/multilingual-e5-large-instruct` | 1024 | 514 tokens (recommended) |
 
 ## Reranking
 
@@ -106,7 +101,7 @@ Rerank a set of documents by relevance to a query:
 
 ```python
 response = client.rerank.create(
-    model="Salesforce/Llama-Rank-V1",
+    model="mixedbread-ai/Mxbai-Rerank-Large-V2",
     query="What is the capital of France?",
     documents=[
         "Paris is the capital of France.",
@@ -131,7 +126,7 @@ const documents = [
 ];
 
 const response = await together.rerank.create({
-  model: "Salesforce/Llama-Rank-V1",
+  model: "mixedbread-ai/Mxbai-Rerank-Large-V2",
   query: "What is the capital of France?",
   documents,
   top_n: 2,
@@ -147,7 +142,7 @@ curl -X POST "https://api.together.xyz/v1/rerank" \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "Salesforce/Llama-Rank-V1",
+    "model": "mixedbread-ai/Mxbai-Rerank-Large-V2",
     "query": "What is the capital of France?",
     "documents": ["Paris is the capital of France.", "Berlin is the capital of Germany."]
   }'
@@ -159,16 +154,17 @@ curl -X POST "https://api.together.xyz/v1/rerank" \
 |-----------|------|-------------|
 | `model` | string | Rerank model (required) |
 | `query` | string | Search query (required) |
-| `documents` | string[] | Documents to rerank (required) |
+| `documents` | string[] or object[] | Documents to rerank (required). Pass objects with named fields for structured documents. |
 | `top_n` | int | Return top N results |
 | `return_documents` | bool | Include document text in response |
+| `rank_fields` | string[] | Fields to use for ranking when documents are JSON objects (e.g., `["title", "text"]`) |
 
 ## RAG Pipeline Pattern
 
 ```python
 # 1. Generate query embedding
 query_embedding = client.embeddings.create(
-    model="BAAI/bge-large-en-v1.5",
+    model="BAAI/bge-base-en-v1.5",
     input="How does photosynthesis work?",
 ).data[0].embedding
 
@@ -177,7 +173,7 @@ candidates = vector_db.search(query_embedding, top_k=20)
 
 # 3. Rerank for precision
 reranked = client.rerank.create(
-    model="Salesforce/Llama-Rank-V1",
+    model="mixedbread-ai/Mxbai-Rerank-Large-V2",
     query="How does photosynthesis work?",
     documents=[c.text for c in candidates],
     top_n=5,
