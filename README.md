@@ -1,12 +1,14 @@
-# Together AI Skills for Claude Code
+# Together AI Skills for Coding Agents
 
-A collection of 13 Claude Code skills that provide comprehensive knowledge of the [Together AI](https://together.ai) platform — inference, training, embeddings, audio, video, images, function calling, and infrastructure.
+A collection of 13 agent skills that provide comprehensive knowledge of the [Together AI](https://together.ai) platform — inference, training, embeddings, audio, video, images, function calling, and infrastructure.
 
-Each skill teaches Claude Code how to use a specific Together AI product, including API patterns, SDK usage, model selection, and best practices. Skills include runnable Python scripts using the **Together Python v2 SDK**.
+Each skill teaches AI coding agents how to use a specific Together AI product, including API patterns, SDK usage, model selection, and best practices. Skills include runnable Python scripts using the **Together Python v2 SDK**.
+
+Compatible with **Claude Code**, **Cursor**, **Codex**, and **Gemini CLI**.
 
 ## What Are Skills?
 
-[Skills](https://docs.anthropic.com/en/docs/claude-code/skills) are markdown instruction files that give Claude Code domain-specific knowledge. When Claude detects that a skill is relevant to your task, it loads the skill's instructions and uses them to write better code.
+[Skills](https://agentskills.io/specification) are markdown instruction files that give AI coding agents domain-specific knowledge. When an agent detects that a skill is relevant to your task, it loads the skill's instructions and uses them to write better code.
 
 Each skill contains:
 
@@ -36,36 +38,26 @@ Each skill contains:
 
 ## Installation
 
-### Claude Code (Plugin Marketplace)
-
-Install the full plugin or individual skills via the Claude Code plugin system:
+### Claude Code
 
 ```bash
-# Install all skills
+# Plugin marketplace
 /plugin marketplace add togethercomputer/skills
 
-# Install individual skills
+# Or install individual skills
 /plugin install together-chat-completions@togethercomputer/skills
-```
 
-### Claude Code (Manual)
-
-Copy the skill folders into your project's `.claude/skills/` directory:
-
-```bash
-# From the repo root — all skills
+# Or copy manually
 cp -r skills/together-* your-project/.claude/skills/
-
-# Or into your home directory for global availability
+# Global availability
 cp -r skills/together-* ~/.claude/skills/
-
-# Or just the skills you need
-cp -r skills/together-chat-completions your-project/.claude/skills/
 ```
+
+### Cursor
+
+Install via the Cursor plugin flow using the `.cursor-plugin/` manifests included in this repository.
 
 ### Codex
-
-Copy skills into the `.agents/skills/` directory:
 
 ```bash
 cp -r skills/together-* your-project/.agents/skills/
@@ -73,37 +65,34 @@ cp -r skills/together-* your-project/.agents/skills/
 
 ### Gemini CLI
 
-Install as a Gemini CLI extension:
-
 ```bash
 gemini extensions install https://github.com/togethercomputer/skills.git --consent
 ```
 
-### Cursor
-
-Install via the Cursor plugin flow using the `.cursor-plugin/` manifests included in this repository.
-
 ### Verify installation
 
 ```bash
+# Claude Code
 ls your-project/.claude/skills/together-*/SKILL.md
+# Codex
+ls your-project/.agents/skills/together-*/SKILL.md
 ```
 
 You should see one `SKILL.md` per installed skill.
 
 ## Usage
 
-Once installed, skills activate automatically when Claude Code detects a relevant task. No explicit invocation is needed.
+Once installed, skills activate automatically when the agent detects a relevant task. No explicit invocation is needed.
 
 ### Examples
 
-**Chat completions** — Ask Claude to build a chat app:
+**Chat completions** — Ask the agent to build a chat app:
 
 ```
 > Build a multi-turn chatbot using Together AI with Llama 3.3 70B
 ```
 
-Claude will use the `together-chat-completions` skill to generate correct v2 SDK code with proper model IDs, parameters, and streaming patterns.
+The agent will use the `together-chat-completions` skill to generate correct v2 SDK code with proper model IDs, parameters, and streaming patterns.
 
 **Function calling** — Ask for tool-using agents:
 
@@ -111,7 +100,7 @@ Claude will use the `together-chat-completions` skill to generate correct v2 SDK
 > Create an agent that can check weather and stock prices using Together AI function calling
 ```
 
-Claude will reference `together-chat-completions` for the complete tool call loop pattern, including parallel tool calls and tool_choice options.
+The agent will reference `together-chat-completions` for the complete tool call loop pattern, including parallel tool calls and tool_choice options.
 
 **Image generation** — Ask for image workflows:
 
@@ -119,7 +108,7 @@ Claude will reference `together-chat-completions` for the complete tool call loo
 > Generate a FLUX image with Together AI and save it locally as PNG
 ```
 
-Claude will use `together-images` to write code with the correct model ID, base64 decoding, and file saving.
+The agent will use `together-images` to write code with the correct model ID, base64 decoding, and file saving.
 
 **Fine-tuning** — Ask to fine-tune a model:
 
@@ -127,7 +116,7 @@ Claude will use `together-images` to write code with the correct model ID, base6
 > Fine-tune Llama 3.1 8B on my dataset using Together AI with LoRA
 ```
 
-Claude will reference `together-fine-tuning` for data format requirements, training parameters, monitoring, and deployment.
+The agent will reference `together-fine-tuning` for data format requirements, training parameters, monitoring, and deployment.
 
 ### Using the scripts
 
@@ -160,10 +149,10 @@ together-<product>/
 
 ### How skills are loaded
 
-1. **Metadata** (YAML frontmatter) — Always available to Claude (~100 words). Used to decide whether to load the skill.
+1. **Metadata** (YAML frontmatter) — Always available to the agent (~100 words). Used to decide whether to load the skill.
 2. **Body** (Markdown) — Loaded when the skill is triggered. Contains API patterns, code examples, and best practices.
-3. **References** — Loaded on demand when Claude needs deeper detail (model lists, full API specs).
-4. **Scripts** — Available as runnable code that Claude can reference or execute directly.
+3. **References** — Loaded on demand when the agent needs deeper detail (model lists, full API specs).
+4. **Scripts** — Available as runnable code that the agent can reference or execute directly.
 
 ## SDK Compatibility
 
@@ -181,7 +170,7 @@ If you're using the v1 SDK, see the [migration guide](https://docs.together.ai/d
 
 ## Requirements
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
+- A supported AI coding agent: [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [Cursor](https://www.cursor.com), [Codex](https://openai.com/index/introducing-codex/), or [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - [Together AI API key](https://api.together.ai/settings/api-keys)
 - Python 3.10+ (for scripts)
 - `pip install together` (v2 SDK, `>=1.0.0`)

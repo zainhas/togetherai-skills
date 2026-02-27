@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This repository contains {{skill_count}} Claude Code skills for the Together AI platform. Each skill is a self-contained directory following the [Agent Skills specification](https://agentskills.io/specification).
+This repository contains {{skill_count}} agent skills for the Together AI platform. Each skill is a self-contained directory following the [Agent Skills specification](https://agentskills.io/specification).
 
 ## Skill registry
 
