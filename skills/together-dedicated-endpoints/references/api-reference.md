@@ -24,6 +24,45 @@ endpoint = client.endpoints.create(
 print(endpoint.id)  # endpoint-abc123
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const endpoint = await together.endpoints.create({
+  model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+  hardware: "4x_nvidia_h100_80gb_sxm",
+  autoscaling: {
+    min_replicas: 1,
+    max_replicas: 3,
+  },
+});
+console.log(endpoint.id);
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/endpoints" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+    "hardware": "4x_nvidia_h100_80gb_sxm",
+    "display_name": "My Llama Endpoint",
+    "autoscaling": {
+      "min_replicas": 1,
+      "max_replicas": 3
+    }
+  }'
+```
+
+```shell
+together endpoints create \
+  --model meta-llama/Llama-3.3-70B-Instruct-Turbo \
+  --hardware 4x_nvidia_h100_80gb_sxm \
+  --display-name "My Llama Endpoint" \
+  --min-replicas 1 --max-replicas 3 \
+  --wait
+```
+
 ### Request Body
 
 | Field | Type | Required | Default | Description |
@@ -36,6 +75,62 @@ print(endpoint.id)  # endpoint-abc123
 | `state` | string | No | `"STARTED"` | `"STARTED"` or `"STOPPED"` |
 | `inactive_timeout` | int/null | No | 60 | Minutes before auto-stop |
 | `availability_zone` | string | No | - | Preferred zone |
+
+## Get Endpoint
+
+```python
+endpoint = client.endpoints.retrieve("endpoint-abc123")
+print(endpoint.state)
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const endpoint = await together.endpoints.retrieve("endpoint-abc123");
+console.log(endpoint);
+```
+
+```shell
+curl "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```shell
+together endpoints retrieve <ENDPOINT_ID>
+together endpoints retrieve <ENDPOINT_ID> --json
+```
+
+## List Endpoints
+
+```python
+endpoints = client.endpoints.list()
+for ep in endpoints:
+    print(ep.id)
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const endpoints = await together.endpoints.list();
+for (const endpoint of endpoints.data) {
+  console.log(endpoint);
+}
+```
+
+```shell
+curl "https://api.together.xyz/v1/endpoints" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```shell
+together endpoints list --mine
+together endpoints list --type dedicated
+together endpoints list --json
+```
 
 ## Endpoint States
 
@@ -52,10 +147,38 @@ print(endpoint.id)  # endpoint-abc123
 
 ```python
 client.endpoints.update(
-    endpoint_id="endpoint-abc123",
+    "endpoint-abc123",
     autoscaling={"min_replicas": 2, "max_replicas": 5},
     display_name="Updated Name",
 )
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+await together.endpoints.update("endpoint-abc123", {
+  autoscaling: { min_replicas: 2, max_replicas: 5 },
+  display_name: "Updated Name",
+});
+```
+
+```shell
+curl -X PATCH "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "autoscaling": {
+      "min_replicas": 2,
+      "max_replicas": 5
+    },
+    "display_name": "Updated Name"
+  }'
+```
+
+```shell
+together endpoints update --min-replicas 2 --max-replicas 5 <ENDPOINT_ID>
+together endpoints update --display-name "Updated Name" <ENDPOINT_ID>
 ```
 
 ### Updatable Fields
@@ -68,16 +191,98 @@ client.endpoints.update(
 
 ```python
 # Start
-client.endpoints.update(endpoint_id="endpoint-abc123", state="STARTED")
+client.endpoints.update("endpoint-abc123", state="STARTED")
 
 # Stop
-client.endpoints.update(endpoint_id="endpoint-abc123", state="STOPPED")
+client.endpoints.update("endpoint-abc123", state="STOPPED")
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+// Start
+await together.endpoints.update("endpoint-abc123", { state: "STARTED" });
+
+// Stop
+await together.endpoints.update("endpoint-abc123", { state: "STOPPED" });
+```
+
+```shell
+# Start
+curl -X PATCH "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"state": "STARTED"}'
+
+# Stop
+curl -X PATCH "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"state": "STOPPED"}'
+```
+
+```shell
+together endpoints start <ENDPOINT_ID>
+together endpoints start <ENDPOINT_ID> --wait
+together endpoints stop <ENDPOINT_ID>
+together endpoints stop <ENDPOINT_ID> --wait
 ```
 
 ## Delete
 
 ```python
-client.endpoints.delete(endpoint_id="endpoint-abc123")
+client.endpoints.delete("endpoint-abc123")
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+await together.endpoints.delete("endpoint-abc123");
+```
+
+```shell
+curl -X DELETE "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+```shell
+together endpoints delete <ENDPOINT_ID>
+```
+
+## List Hardware
+
+```python
+hardware = client.endpoints.list_hardware()
+for hw in hardware:
+    print(hw.id)
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const hardware = await together.endpoints.list_hardware();
+console.log(hardware);
+```
+
+```shell
+curl "https://api.together.xyz/v1/hardware" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+
+# Filter by model
+curl "https://api.together.xyz/v1/hardware?model=meta-llama/Llama-3.3-70B-Instruct-Turbo" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```shell
+together endpoints hardware
+together endpoints hardware --model meta-llama/Llama-3.3-70B-Instruct-Turbo
+together endpoints hardware --model meta-llama/Llama-3.3-70B-Instruct-Turbo --available
+together endpoints hardware --model meta-llama/Llama-3.3-70B-Instruct-Turbo --json
 ```
 
 ## Using the Endpoint
@@ -93,32 +298,63 @@ response = client.chat.completions.create(
 )
 ```
 
-## CLI Commands
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.chat.completions.create({
+  model: "endpoint-abc123",  // or endpoint name
+  messages: [{ role: "user", content: "Hello!" }],
+});
+console.log(response.choices[0].message.content);
+```
 
 ```shell
-# Create
-together endpoints create --model meta-llama/Llama-3.3-70B-Instruct-Turbo \
-  --hardware 4x_nvidia_h100_80gb_sxm --min-replicas 1 --max-replicas 3
-
-# List hardware
-together endpoints hardware --model meta-llama/Llama-3.3-70B-Instruct-Turbo
-
-# Get status
-together endpoints retrieve <ENDPOINT_ID>
-
-# List yours
-together endpoints list --mine
-
-# Start/Stop
-together endpoints start <ENDPOINT_ID>
-together endpoints stop <ENDPOINT_ID>
-
-# Update
-together endpoints update --min-replicas 2 --max-replicas 5 <ENDPOINT_ID>
-
-# Delete
-together endpoints delete <ENDPOINT_ID>
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "endpoint-abc123",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
 ```
+
+## CLI Reference
+
+| Command | Description |
+|---------|-------------|
+| `together endpoints create` | Create a new endpoint |
+| `together endpoints retrieve <ID>` | Get endpoint details |
+| `together endpoints list` | List endpoints |
+| `together endpoints update <ID>` | Update endpoint config |
+| `together endpoints start <ID>` | Start a stopped endpoint |
+| `together endpoints stop <ID>` | Stop a running endpoint |
+| `together endpoints delete <ID>` | Delete an endpoint |
+| `together endpoints hardware` | List available hardware |
+| `together endpoints availability-zones` | List availability zones |
+
+### Create Options
+
+| Flag | Description |
+|------|-------------|
+| `--model` | (required) Model to deploy |
+| `--hardware` | (required) Hardware config ID |
+| `--min-replicas` | Minimum replica count |
+| `--max-replicas` | Maximum replica count |
+| `--display-name` | Human-readable name |
+| `--no-auto-start` | Create in STOPPED state |
+| `--no-speculative-decoding` | Disable speculative decoding |
+| `--availability-zone` | Preferred availability zone |
+| `--wait` | Wait for endpoint to be ready |
+| `--json` | Output in JSON format |
+
+### Hardware Options
+
+| Flag | Description |
+|------|-------------|
+| `--model` | Filter by model compatibility |
+| `--available` | Show only available hardware (requires `--model`) |
+| `--json` | Output in JSON format |
 
 ## Endpoint Response Object
 

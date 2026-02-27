@@ -31,14 +31,6 @@ together endpoints hardware --model mistralai/Mixtral-8x7B-Instruct-v0.1
 
 ### Create an Endpoint
 
-```shell
-together endpoints create \
-  --model mistralai/Mixtral-8x7B-Instruct-v0.1 \
-  --gpu h100 --gpu-count 2 \
-  --min-replicas 1 --max-replicas 3 \
-  --no-speculative-decoding --wait
-```
-
 ```python
 from together import Together
 client = Together()
@@ -53,6 +45,45 @@ print(endpoint.id)  # endpoint-xxxxxxxx for management
 print(endpoint.name)  # account/model-name-hash for inference
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const endpoint = await together.endpoints.create({
+  model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  hardware: "2x_nvidia_h100_80gb_sxm",
+  autoscaling: {
+    min_replicas: 1,
+    max_replicas: 3,
+  },
+});
+console.log(endpoint.id);
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/endpoints" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+    "hardware": "2x_nvidia_h100_80gb_sxm",
+    "display_name": "My Mixtral Endpoint",
+    "autoscaling": {
+      "min_replicas": 1,
+      "max_replicas": 3
+    }
+  }'
+```
+
+```shell
+together endpoints create \
+  --model mistralai/Mixtral-8x7B-Instruct-v0.1 \
+  --hardware 2x_nvidia_h100_80gb_sxm \
+  --display-name "My Mixtral Endpoint" \
+  --min-replicas 1 --max-replicas 3 \
+  --no-speculative-decoding --wait
+```
+
 ### Send Inference Requests
 
 Use the **endpoint name** (not ID) as the `model` parameter:
@@ -65,17 +96,99 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 ```
 
-### Manage Endpoints
+```typescript
+import Together from "together-ai";
+const together = new Together();
 
-```shell
-together endpoints get <ENDPOINT_ID>       # Check status
-together endpoints list --mine             # List all endpoints
-together endpoints start <ENDPOINT_ID>     # Start stopped endpoint
-together endpoints stop <ENDPOINT_ID>      # Stop (pause billing)
-together endpoints delete <ENDPOINT_ID>    # Permanently delete
+const response = await together.chat.completions.create({
+  model: "tester/mistralai/Mixtral-8x7B-Instruct-v0.1-bb04c904",
+  messages: [{ role: "user", content: "Hello!" }],
+});
+console.log(response.choices[0].message.content);
 ```
 
 ```shell
+curl -X POST "https://api.together.xyz/v1/chat/completions" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "tester/mistralai/Mixtral-8x7B-Instruct-v0.1-bb04c904",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### Manage Endpoints
+
+```python
+# Get endpoint status
+endpoint = client.endpoints.retrieve("endpoint-abc123")
+print(endpoint.state)
+
+# Start / Stop
+client.endpoints.update("endpoint-abc123", state="STARTED")
+client.endpoints.update("endpoint-abc123", state="STOPPED")
+
+# Update replicas
+client.endpoints.update(
+    "endpoint-abc123",
+    autoscaling={"min_replicas": 2, "max_replicas": 4},
+)
+
+# Delete
+client.endpoints.delete("endpoint-abc123")
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+// Get endpoint status
+const endpoint = await together.endpoints.retrieve("endpoint-abc123");
+console.log(endpoint.state);
+
+// Start / Stop
+await together.endpoints.update("endpoint-abc123", { state: "STARTED" });
+await together.endpoints.update("endpoint-abc123", { state: "STOPPED" });
+
+// Update replicas
+await together.endpoints.update("endpoint-abc123", {
+  autoscaling: { min_replicas: 2, max_replicas: 4 },
+});
+
+// Delete
+await together.endpoints.delete("endpoint-abc123");
+```
+
+```shell
+# Get endpoint status
+curl "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+
+# Stop endpoint
+curl -X PATCH "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"state": "STOPPED"}'
+
+# Start endpoint
+curl -X PATCH "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"state": "STARTED"}'
+
+# Delete endpoint
+curl -X DELETE "https://api.together.xyz/v1/endpoints/endpoint-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+```shell
+# CLI management commands
+together endpoints retrieve <ENDPOINT_ID>    # Check status
+together endpoints list --mine               # List all endpoints
+together endpoints start <ENDPOINT_ID>       # Start stopped endpoint
+together endpoints stop <ENDPOINT_ID>        # Stop (pause billing)
+together endpoints delete <ENDPOINT_ID>      # Permanently delete
+
 # Update replicas (both min and max required together)
 together endpoints update --min-replicas 2 --max-replicas 4 <ENDPOINT_ID>
 ```
