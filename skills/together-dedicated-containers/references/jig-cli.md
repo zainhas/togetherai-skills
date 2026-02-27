@@ -334,7 +334,7 @@ This is useful for managing multiple environments (e.g., `staging_jig.toml`, `pr
 | `port` | int | `8000` | Container listen port |
 | `health_check_path` | string | `"/health"` | Health endpoint (must return 200 when ready) |
 | `termination_grace_period_seconds` | int | `300` | Shutdown timeout for in-flight jobs |
-| `command` | string | `null` | Override startup command at deploy time |
+| `command` | string[] | `null` | Override startup command at deploy time (e.g., `["python", "app.py", "--queue"]`) |
 
 ### `[tool.jig.deploy.environment_variables]`
 

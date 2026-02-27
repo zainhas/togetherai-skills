@@ -15,7 +15,7 @@ Usage:
     together beta jig deploy
 
 Requires:
-    pip install sprocket
+    pip install sprocket --extra-index-url https://pypi.together.ai/
     # For deployment: pip install together
 
 Example pyproject.toml:

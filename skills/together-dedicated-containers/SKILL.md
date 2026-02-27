@@ -28,25 +28,26 @@ Run custom Dockerized inference workloads on Together's managed GPU infrastructu
 ### 1. Install Jig CLI
 
 ```shell
-pip install jig-together
-jig auth login  # Authenticate with Together AI
+pip install together
+# Set your API key as an environment variable:
+# export TOGETHER_API_KEY=<your-api-key>
 ```
 
 ### 2. Create Inference Worker
 
 ```python
 # worker.py
-from sprocket import SprocketWorker
+import sprocket
 
-class MyWorker(SprocketWorker):
+class MyWorker(sprocket.Sprocket):
     def setup(self):
         """Load model and resources (runs once at startup)."""
         import torch
         self.model = torch.load("model.pt")
 
-    def predict(self, request):
+    def predict(self, args: dict) -> dict:
         """Handle a single inference request."""
-        input_data = request.json()
+        input_data = args
         result = self.model(input_data["prompt"])
         return {"output": result}
 ```
@@ -55,11 +56,25 @@ class MyWorker(SprocketWorker):
 
 ```toml
 # pyproject.toml
-[tool.jig]
+[project]
 name = "my-inference-service"
-gpu = "A100"
+version = "0.1.0"
+dependencies = ["sprocket"]
+
+[[tool.uv.index]]
+name = "together-pypi"
+url = "https://pypi.together.ai/"
+
+[tool.uv.sources]
+sprocket = { index = "together-pypi" }
+
+[tool.jig.image]
+cmd = "python worker.py --queue"
+copy = ["worker.py"]
+
+[tool.jig.deploy]
+gpu_type = "h100-80gb"
 gpu_count = 1
-worker = "worker:MyWorker"
 ```
 
 ### 4. Build, Push, Deploy
@@ -147,10 +162,10 @@ together beta jig submit --payload '{"prompt": "Hello world"}' --watch
 
 ## Sprocket SDK
 
-The SDK provides the `SprocketWorker` base class:
+The SDK provides the `sprocket.Sprocket` base class:
 
 - `setup()`: Called once at startup — load models, warm up caches
-- `predict(request)`: Called per request — process input and return output
+- `predict(args: dict) -> dict`: Called per request — process input and return output
 - File handling: Upload/download files within predictions
 - GPU access: Full CUDA access inside the container
 

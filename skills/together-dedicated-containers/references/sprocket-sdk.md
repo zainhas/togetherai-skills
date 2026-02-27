@@ -6,8 +6,8 @@ Sprocket is the worker framework for Together Dedicated Containers. It handles j
 ## Installation
 
 ```shell
-pip install sprocket
-# or with Together's private PyPI:
+pip install sprocket --extra-index-url https://pypi.together.ai/
+# or with Together's private PyPI in pyproject.toml:
 [[tool.uv.index]]
 name = "together-pypi"
 url = "https://pypi.together.ai/"
@@ -151,12 +151,12 @@ sprocket.run(MultiGPUModel(), "my-model", use_torchrun=True)
 
 Config for multi-GPU:
 ```toml
-[tool.jig.image]
-cmd = "torchrun --standalone --nproc_per_node=2 app.py"
-
 [tool.jig.deploy]
+gpu_type = "h100-80gb"
 gpu_count = 2
 ```
+
+When `use_torchrun=True` is passed to `sprocket.run()`, Sprocket launches torchrun internally. No need to override `cmd`.
 
 ## Graceful Shutdown
 
