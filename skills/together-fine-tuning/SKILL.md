@@ -42,6 +42,33 @@ file_resp = client.files.upload("training_data.jsonl", purpose="fine-tune", chec
 print(file_resp.id)
 ```
 
+```typescript
+import { upload } from "together-ai/lib/upload";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const filepath = path.join(__dirname, "training_data.jsonl");
+const file = await upload(filepath);
+console.log(file.id);
+```
+
+```shell
+# Upload file
+curl "https://api.together.xyz/v1/files/upload" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -F "file=@training_data.jsonl" \
+  -F "file_name=training_data.jsonl" \
+  -F "purpose=fine-tune"
+```
+
+```shell
+# CLI: check and upload
+together files check "training_data.jsonl"
+together files upload "training_data.jsonl"
+```
+
 ### 3. Start LoRA Fine-Tuning (Recommended)
 
 ```python
@@ -56,6 +83,41 @@ job = client.fine_tuning.create(
 print(job.id)
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.fineTuning.create({
+  model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Reference",
+  training_file: "file-abc123",
+});
+console.log(response.id);
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/fine-tunes" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "meta-llama/Meta-Llama-3.1-8B-Instruct-Reference",
+    "training_file": "file-abc123",
+    "n_epochs": 3,
+    "learning_rate": 1e-5,
+    "suffix": "my-model-v1"
+  }'
+```
+
+```shell
+# CLI
+together fine-tuning create \
+  --training-file "file-abc123" \
+  --model "meta-llama/Meta-Llama-3.1-8B-Instruct-Reference" \
+  --lora \
+  --n-epochs 3 \
+  --learning-rate 1e-5 \
+  --suffix "my-model-v1"
+```
+
 ### 4. Monitor
 
 ```python
@@ -64,6 +126,35 @@ print(status.status)  # Pending → Queued → Running → Uploading → Complet
 
 for event in client.fine_tuning.list_events(id=job.id).data:
     print(event.message)
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const fineTune = await together.fineTuning.retrieve("ft-abc123");
+console.log(fineTune.status);
+
+const events = await together.fineTuning.listEvents("ft-abc123");
+console.log(events);
+```
+
+```shell
+curl "https://api.together.xyz/v1/fine-tunes/ft-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+
+# List events
+curl "https://api.together.xyz/v1/fine-tunes/ft-abc123/events" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```shell
+# CLI: status and events
+together fine-tuning status ft-abc123
+together fine-tuning list-events ft-abc123
+together fine-tuning retrieve ft-abc123
 ```
 
 ### 5. Use Fine-Tuned Model
@@ -97,6 +188,17 @@ job = client.fine_tuning.create(
     learning_rate=1e-5,
     suffix="full-ft-v1",
 )
+```
+
+```shell
+# CLI: use --no-lora for full fine-tuning
+together fine-tuning create \
+  --training-file "file-abc123" \
+  --model "meta-llama/Meta-Llama-3.1-8B-Instruct-Reference" \
+  --no-lora \
+  --n-epochs 3 \
+  --learning-rate 1e-5 \
+  --suffix "full-ft-v1"
 ```
 
 ## DPO Preference Fine-Tuning
@@ -178,6 +280,23 @@ client.fine_tuning.retrieve(job_id)        # Get status
 client.fine_tuning.list_events(id=job_id)  # Get logs
 client.fine_tuning.cancel(id=job_id)       # Cancel
 client.fine_tuning.delete(job_id)          # Delete (irreversible)
+```
+
+```typescript
+const jobs = await together.fineTuning.list();               // List all jobs
+const job = await together.fineTuning.retrieve("ft-abc123"); // Get status
+const events = await together.fineTuning.listEvents("ft-abc123"); // Get logs
+await together.fineTuning.cancel("ft-abc123");               // Cancel
+```
+
+```shell
+# CLI
+together fine-tuning list
+together fine-tuning retrieve ft-abc123
+together fine-tuning status ft-abc123
+together fine-tuning list-events ft-abc123
+together fine-tuning cancel ft-abc123
+together fine-tuning delete ft-abc123
 ```
 
 ## Resources

@@ -38,15 +38,38 @@ endpoint = client.endpoints.create(
 
 Download and run locally or on your infrastructure.
 
+```python
+# Download model weights
+client.fine_tuning.download(
+    id="ft-abc123",
+    output="my-model/model.tar.zst",
+)
+```
+
 ```shell
-together fine-tuning download <FT-JOB-ID>
-# Downloads as .tar.zst file
+# CLI: download model weights
+together fine-tuning download ft-abc123
+
+# Download to a specific directory
+together fine-tuning download ft-abc123 --output_dir ./my-model
+
+# Download a specific checkpoint step
+together fine-tuning download ft-abc123 --checkpoint-step 48
+
+# Download merged or adapter-only weights (LoRA jobs)
+together fine-tuning download ft-abc123 --checkpoint-type merged
+together fine-tuning download ft-abc123 --checkpoint-type adapter
+```
+
+```shell
+# Extract the downloaded archive
 tar -xf model-name.tar.zst
 ```
 
 Options:
-- `--output`, `-o` — Custom filename
-- `--step`, `-s` — Download specific checkpoint (default: latest)
+- `--output_dir`, `-o` — Specify the output directory
+- `--checkpoint-step`, `-s` — Download a specific checkpoint's weights (default: latest)
+- `--checkpoint-type` — Checkpoint type: `default`, `merged`, or `adapter` (merged/adapter only for LoRA jobs)
 
 Extracted files include: `pytorch_model.bin`, `config.json`, tokenizer files.
 
@@ -87,14 +110,6 @@ Extracted files include: `pytorch_model.bin`, `config.json`, tokenizer files.
 ### Status Flow
 `Pending` → `Queued` → `Running` → `Uploading` → `Completed`
 
-### CLI
-```shell
-together fine-tuning retrieve <JOB_ID>
-together fine-tuning list-events <JOB_ID>
-together fine-tuning list
-together fine-tuning cancel <JOB_ID>
-```
-
 ### Python SDK
 ```python
 status = client.fine_tuning.retrieve(job_id)
@@ -103,6 +118,47 @@ print(status.status)
 events = client.fine_tuning.list_events(id=job_id)
 for event in events.data:
     print(event.message)
+```
+
+### TypeScript SDK
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const fineTune = await together.fineTuning.retrieve("ft-abc123");
+console.log(fineTune.status);
+
+const events = await together.fineTuning.listEvents("ft-abc123");
+console.log(events);
+```
+
+### cURL
+```shell
+# Retrieve job details
+curl "https://api.together.xyz/v1/fine-tunes/ft-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+
+# List events
+curl "https://api.together.xyz/v1/fine-tunes/ft-abc123/events" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+
+# List checkpoints
+curl "https://api.together.xyz/v1/fine-tunes/ft-abc123/checkpoints" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+### CLI
+```shell
+together fine-tuning status <JOB_ID>
+together fine-tuning retrieve <JOB_ID>
+together fine-tuning list-events <JOB_ID>
+together fine-tuning list-checkpoints <JOB_ID>
+together fine-tuning list
+together fine-tuning cancel <JOB_ID>
+together fine-tuning delete <JOB_ID>
 ```
 
 ## Continued Fine-tuning

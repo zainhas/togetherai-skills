@@ -108,14 +108,58 @@
 
 ## Data Validation
 
-```shell
-together files check my_data.jsonl
-together files upload my_data.jsonl
+```python
+from together import Together
+from together.utils import check_file
+
+client = Together()
+
+# Check format locally
+report = check_file("my_data.jsonl")
+print(report)  # {"is_check_passed": true, "message": "Checks passed", ...}
+
+# Upload with server-side validation
+file = client.files.upload(file="my_data.jsonl", purpose="fine-tune", check=True)
+print(file.id)  # file-abc123
 ```
 
-```python
-file = client.files.upload(file="my_data.jsonl", check=True)
-print(file.id)  # file-abc123
+```typescript
+import { upload } from "together-ai/lib/upload";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const filepath = path.join(__dirname, "my_data.jsonl");
+const file = await upload(filepath);
+console.log(file.id);
+```
+
+```shell
+# cURL: upload a file
+curl "https://api.together.xyz/v1/files/upload" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -F "file=@my_data.jsonl" \
+  -F "file_name=my_data.jsonl" \
+  -F "purpose=fine-tune"
+```
+
+```shell
+# CLI: check format and upload
+together files check my_data.jsonl
+together files upload my_data.jsonl
+
+# Upload without format checking
+together files upload my_data.jsonl --no-check
+
+# List uploaded files
+together files list
+
+# Retrieve file metadata
+together files retrieve <FILE-ID>
+
+# Download a previously uploaded file
+together files retrieve-content <FILE-ID>
 ```
 
 ## Converting Image URLs to Base64
