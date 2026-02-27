@@ -30,8 +30,8 @@ Example: `2x_nvidia_a100_80gb_sxm`
 
 ```python
 # For a specific model
-hardware = client.endpoints.hardware.list(model="meta-llama/Llama-3.3-70B-Instruct-Turbo")
-for hw in hardware:
+response = client.endpoints.list_hardware(model="meta-llama/Llama-3.3-70B-Instruct-Turbo")
+for hw in response.data:
     print(f"{hw.id}: {hw.specs.gpu_count}x {hw.specs.gpu_type} @ ${hw.pricing.cents_per_minute:.2f}/min")
 ```
 

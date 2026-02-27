@@ -105,8 +105,8 @@ together endpoints retrieve <ENDPOINT_ID> --json
 ## List Endpoints
 
 ```python
-endpoints = client.endpoints.list()
-for ep in endpoints:
+response = client.endpoints.list()
+for ep in response.data:
     print(ep.id)
 ```
 
@@ -254,8 +254,8 @@ together endpoints delete <ENDPOINT_ID>
 ## List Hardware
 
 ```python
-hardware = client.endpoints.list_hardware()
-for hw in hardware:
+response = client.endpoints.list_hardware()
+for hw in response.data:
     print(hw.id)
 ```
 
