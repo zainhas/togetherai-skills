@@ -51,10 +51,10 @@ def execute_code(code: str, session_id: str | None = None) -> dict:
 
 def list_sessions():
     """List active code interpreter sessions."""
-    sessions = client.code_interpreter.sessions.list()
-    for s in sessions:
+    response = client.code_interpreter.sessions.list()
+    for s in response.data.sessions:
         print(f"  Session {s.id}: {s.execute_count} executions, expires {s.expires_at}")
-    return sessions
+    return response.data.sessions
 
 
 if __name__ == "__main__":
