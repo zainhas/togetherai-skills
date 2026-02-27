@@ -14,7 +14,7 @@
 ### 1. Upload Input File
 
 ```python
-file = client.files.upload(file="batch_input.jsonl", purpose="batch-api")
+file = client.files.upload(file="batch_input.jsonl", purpose="batch-api", check=False)
 print(file.id)  # file-abc123
 ```
 
@@ -41,7 +41,7 @@ batch = client.batches.create(
     endpoint="/v1/chat/completions",
     completion_window="24h",
 )
-print(batch.id)  # batch-abc123
+print(batch.job.id)  # batch-abc123
 ```
 
 ```typescript
@@ -84,7 +84,8 @@ curl -X GET "https://api.together.xyz/v1/batches/batch-abc123" \
 
 ```python
 if status.status == "COMPLETED":
-    output = client.files.retrieve_content(status.output_file_id)
+    with client.files.with_streaming_response.content(id=status.output_file_id) as response:
+        output = b"".join(response.iter_bytes())
 ```
 
 ```typescript

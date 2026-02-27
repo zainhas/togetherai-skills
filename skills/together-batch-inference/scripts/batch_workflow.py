@@ -47,7 +47,7 @@ with open(input_path, "w") as f:
 print(f"Wrote {len(requests)} requests to {input_path}")
 
 # --- 2. Upload input file ---
-file_response = client.files.upload(file=input_path, purpose="batch-api")
+file_response = client.files.upload(file=input_path, purpose="batch-api", check=False)
 file_id = file_response.id
 print(f"Uploaded file: {file_id}")
 
@@ -76,11 +76,11 @@ while True:
 
 # --- 5. Download results ---
 if batch.output_file_id:
-    output_response = client.files.content(batch.output_file_id)
     output_path = "batch_results.jsonl"
-    with open(output_path, "wb") as f:
-        for chunk in output_response.iter_bytes():
-            f.write(chunk)
+    with client.files.with_streaming_response.content(id=batch.output_file_id) as output_response:
+        with open(output_path, "wb") as f:
+            for chunk in output_response.iter_bytes():
+                f.write(chunk)
     print(f"\nResults saved to {output_path}")
 
     with open(output_path) as f:
@@ -92,9 +92,9 @@ if batch.output_file_id:
 
 # --- 6. Check for errors ---
 if batch.error_file_id:
-    error_response = client.files.content(batch.error_file_id)
     error_path = "batch_errors.jsonl"
-    with open(error_path, "wb") as f:
-        for chunk in error_response.iter_bytes():
-            f.write(chunk)
+    with client.files.with_streaming_response.content(id=batch.error_file_id) as error_response:
+        with open(error_path, "wb") as f:
+            for chunk in error_response.iter_bytes():
+                f.write(chunk)
     print(f"Errors saved to {error_path}")

@@ -158,6 +158,7 @@ curl -X GET "https://api.together.xyz/v1/batches" \
 | `COMPLETED` | Done — download results |
 | `FAILED` | Processing failed |
 | `CANCELLED` | Batch was cancelled |
+| `EXPIRED` | Job expired before completion |
 
 Output order may differ from input — use `custom_id` to match results.
 
@@ -170,10 +171,18 @@ Output order may differ from input — use `custom_id` to match results.
 | meta-llama/Llama-4-Scout-17B-16E-Instruct | 50% |
 | meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo | 50% |
 | meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo | 50% |
+| meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo | 50% |
+| meta-llama/Meta-Llama-3-70B-Instruct-Turbo | 50% |
+| meta-llama/Llama-3-70b-chat-hf | 50% |
 | meta-llama/Llama-3.3-70B-Instruct-Turbo | 50% |
 | Qwen/Qwen2.5-72B-Instruct-Turbo | 50% |
+| Qwen/Qwen2.5-7B-Instruct-Turbo | 50% |
 | Qwen/Qwen3-235B-A22B-fp8-tput | 50% |
+| Qwen/Qwen3-235B-A22B-Thinking-2507 | 50% |
+| Qwen/Qwen2.5-VL-72B-Instruct | 50% |
 | mistralai/Mixtral-8x7B-Instruct-v0.1 | 50% |
+| mistralai/Mistral-7B-Instruct-v0.1 | 50% |
+| zai-org/GLM-4.5-Air-FP8 | 50% |
 | openai/whisper-large-v3 | 50% |
 
 All serverless models are available for batch — models not listed have no discount.
