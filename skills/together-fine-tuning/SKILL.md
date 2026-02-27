@@ -38,7 +38,7 @@ report = check_file("training_data.jsonl")
 assert report["is_check_passed"]
 
 # Upload
-file_resp = client.files.upload("training_data.jsonl", purpose="fine-tune", check=True)
+file_resp = client.files.upload(file="training_data.jsonl", purpose="fine-tune", check=True)
 print(file_resp.id)
 ```
 

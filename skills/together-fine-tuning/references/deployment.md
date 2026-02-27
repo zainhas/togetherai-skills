@@ -89,7 +89,7 @@ Extracted files include: `pytorch_model.bin`, `config.json`, tokenizer files.
 | `lora` | bool | true | Use LoRA method |
 | `lora_r` | int | 64 | LoRA rank |
 | `lora_alpha` | int | 16 | LoRA scaling factor |
-| `train_on_inputs` | bool/str | false | Train on prompts/user msgs |
+| `train_on_inputs` | bool/str | "auto" | Train on prompts/user msgs |
 | `wandb_api_key` | string | - | W&B integration |
 
 ### DPO-specific Parameters
@@ -175,6 +175,6 @@ response = client.fine_tuning.create(
 ## Pricing
 
 - Based on total tokens processed
-- Minimum: $5 per job
+- No minimum price — you only pay for tokens processed
 - Token calculation: `(n_epochs × training_tokens) + (n_evals × validation_tokens)`
 - Varies by model size and method (LoRA vs Full, SFT vs DPO)

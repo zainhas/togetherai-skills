@@ -53,7 +53,7 @@ print(f"Uploaded file: {file_id}")
 # --- 3. Create fine-tuning job ---
 job = client.fine_tuning.create(
     training_file=file_id,
-    model="meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
+    model="meta-llama/Meta-Llama-3.1-8B-Instruct-Reference",
     n_epochs=3,
     learning_rate=1e-5,
     lora=True,

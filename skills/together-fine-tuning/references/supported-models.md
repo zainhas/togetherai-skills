@@ -11,35 +11,35 @@
 | GPT-OSS 120B | `openai/gpt-oss-120b` | - |
 | DeepSeek R1 | `deepseek-ai/DeepSeek-R1` | - |
 | DeepSeek V3 | `deepseek-ai/DeepSeek-V3` | - |
-| Qwen3 235B Thinking | `Qwen/Qwen3-235B-A22B-Thinking-2507` | - |
+| Qwen3 235B | `Qwen/Qwen3-235B-A22B` | - |
 | Qwen3 235B Instruct | `Qwen/Qwen3-235B-A22B-Instruct-2507` | - |
 
 ### Medium Models (7B-70B)
 | Model | API String |
 |-------|-----------|
-| Llama 3.3 70B | `meta-llama/Llama-3.3-70B-Instruct-Turbo` |
-| Llama 3.1 70B | `meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo` |
-| Llama 3.1 8B | `meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo` |
+| Llama 3.3 70B | `meta-llama/Llama-3.3-70B-Instruct-Reference` |
+| Llama 3.1 70B | `meta-llama/Meta-Llama-3.1-70B-Instruct-Reference` |
+| Llama 3.1 8B | `meta-llama/Meta-Llama-3.1-8B-Instruct-Reference` |
 | GPT-OSS 20B | `openai/gpt-oss-20b` |
-| Qwen 2.5 72B | `Qwen/Qwen2.5-72B-Instruct-Turbo` |
-| Qwen 2.5 7B | `Qwen/Qwen2.5-7B-Instruct-Turbo` |
+| Qwen 2.5 72B | `Qwen/Qwen2.5-72B-Instruct` |
+| Qwen 2.5 7B | `Qwen/Qwen2.5-7B-Instruct` |
 | Mixtral 8x7B | `mistralai/Mixtral-8x7B-Instruct-v0.1` |
 
 ### Small Models (<7B)
 | Model | API String |
 |-------|-----------|
-| Llama 3.2 3B | `meta-llama/Llama-3.2-3B-Instruct-Turbo` |
-| Llama 3.2 1B | `meta-llama/Llama-3.2-1B-Instruct-Turbo` |
+| Llama 3.2 3B | `meta-llama/Llama-3.2-3B-Instruct` |
+| Llama 3.2 1B | `meta-llama/Llama-3.2-1B-Instruct` |
 | Gemma 3 4B | `google/gemma-3-4b-it` |
 | Gemma 3 1B | `google/gemma-3-1b-it` |
-| Qwen 2.5 0.5B | `Qwen/Qwen2.5-0.5B-Instruct` |
+| Qwen 2.5 1.5B | `Qwen/Qwen2.5-1.5B-Instruct` |
 
 ### Long-context LoRA (32K-131K)
 | Model | API String | Max Context |
 |-------|-----------|-------------|
 | DeepSeek R1 | `deepseek-ai/DeepSeek-R1` | 131K |
-| Llama 3.3 70B | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | 131K |
-| Llama 3.1 8B | `meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo` | 131K |
+| Llama 3.3 70B | `meta-llama/Llama-3.3-70B-Instruct-Reference` | 131K |
+| Llama 3.1 8B | `meta-llama/Meta-Llama-3.1-8B-Instruct-Reference` | 131K |
 | Qwen3 variants | Various | 32K-131K |
 
 ## Full Fine-tuning
