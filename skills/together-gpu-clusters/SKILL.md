@@ -202,11 +202,17 @@ together beta clusters delete <CLUSTER_ID>
 ## Terraform Integration
 
 ```hcl
-resource "together_cluster" "training" {
-  name         = "my-training-cluster"
-  gpu_type     = "h100"
-  num_nodes    = 4
-  orchestrator = "kubernetes"
+resource "together_gpu_cluster" "training" {
+  name              = "my-training-cluster"
+  num_gpus          = 8
+  instance_type     = "H100-SXM"
+  region            = "us-central-8"
+  billing_type      = "prepaid"
+  reservation_days  = 30
+  shared_volume {
+    name     = "training-data"
+    size_tib = 5
+  }
 }
 ```
 
@@ -221,12 +227,11 @@ terraform apply
 ```yaml
 # sky.yaml
 resources:
-  cloud: together
   accelerators: H100:8
-  num_nodes: 4
+  cloud: kubernetes
 
 setup: |
-  pip install torch
+  pip install torch transformers
 
 run: |
   torchrun --nproc_per_node=8 train.py
