@@ -18,6 +18,21 @@ file = client.files.upload(file="batch_input.jsonl", purpose="batch-api")
 print(file.id)  # file-abc123
 ```
 
+```typescript
+import Together from "together-ai";
+const client = new Together();
+
+// Use the file ID returned by the Files API upload
+const fileId = "file-abc123";
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/files" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -F "purpose=batch-api" \
+  -F "file=@batch_input.jsonl"
+```
+
 ### 2. Create Batch
 
 ```python
@@ -29,6 +44,22 @@ batch = client.batches.create(
 print(batch.id)  # batch-abc123
 ```
 
+```typescript
+const batch = await client.batches.create({
+  endpoint: "/v1/chat/completions",
+  input_file_id: fileId,
+});
+
+console.log(batch);
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/batches" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"input_file_id": "file-abc123", "endpoint": "/v1/chat/completions"}'
+```
+
 ### 3. Check Status
 
 ```python
@@ -37,11 +68,65 @@ print(status.status)    # VALIDATING, IN_PROGRESS, COMPLETED, FAILED
 print(status.progress)  # 0.0 to 100.0
 ```
 
+```typescript
+const batchId = batch.job?.id;
+
+let batchInfo = await client.batches.retrieve(batchId);
+console.log(batchInfo.status);
+```
+
+```shell
+curl -X GET "https://api.together.xyz/v1/batches/batch-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
 ### 4. Download Results
 
 ```python
 if status.status == "COMPLETED":
     output = client.files.retrieve_content(status.output_file_id)
+```
+
+```typescript
+const batchResult = await client.batches.retrieve(batchId);
+
+if (batchResult.status === "COMPLETED" && batchResult.output_file_id) {
+  const resp = await client.files.content(batchResult.output_file_id);
+  const result = await resp.text();
+  console.log(result);
+}
+```
+
+### 5. Cancel Batch
+
+```python
+client.batches.cancel(batch_id)
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/batches/batch-abc123/cancel" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+### 6. List Batches
+
+```python
+batches = client.batches.list()
+for batch in batches:
+    print(batch)
+```
+
+```typescript
+const allBatches = await client.batches.list();
+
+for (const batch of allBatches) {
+  console.log(batch);
+}
+```
+
+```shell
+curl -X GET "https://api.together.xyz/v1/batches" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
 ```
 
 ## Input File Format (JSONL)

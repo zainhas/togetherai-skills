@@ -51,10 +51,29 @@ print(batch.job.id)
 import Together from "together-ai";
 const client = new Together();
 
+// Upload (use the file ID returned by the Files API)
+const fileId = "file-abc123";
+
 const batch = await client.batches.create({
   endpoint: "/v1/chat/completions",
   input_file_id: fileId,
 });
+
+console.log(batch);
+```
+
+```shell
+# Upload the batch file
+curl -X POST "https://api.together.xyz/v1/files" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -F "purpose=batch-api" \
+  -F "file=@batch_input.jsonl"
+
+# Create the batch (use the file id from upload response)
+curl -X POST "https://api.together.xyz/v1/batches" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"input_file_id": "file-abc123", "endpoint": "/v1/chat/completions"}'
 ```
 
 ### 3. Check Status
@@ -62,6 +81,21 @@ const batch = await client.batches.create({
 ```python
 status = client.batches.retrieve(batch.job.id)
 print(status.status)  # VALIDATING → IN_PROGRESS → COMPLETED
+```
+
+```typescript
+import Together from "together-ai";
+const client = new Together();
+
+const batchId = batch.job?.id;
+
+let batchInfo = await client.batches.retrieve(batchId);
+console.log(batchInfo.status);
+```
+
+```shell
+curl -X GET "https://api.together.xyz/v1/batches/batch-abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
 ```
 
 ### 4. Download Results
@@ -74,11 +108,45 @@ if status.status == "COMPLETED":
                 f.write(chunk)
 ```
 
+```typescript
+import Together from "together-ai";
+const client = new Together();
+
+const batchInfo = await client.batches.retrieve(batchId);
+
+if (batchInfo.status === "COMPLETED" && batchInfo.output_file_id) {
+  const resp = await client.files.content(batchInfo.output_file_id);
+  const result = await resp.text();
+  console.log(result);
+}
+```
+
 ### 5. Cancel / List
 
 ```python
 client.batches.cancel(batch_id)      # Cancel a batch
 batches = client.batches.list()       # List all batches
+```
+
+```typescript
+import Together from "together-ai";
+const client = new Together();
+
+// List all batches
+const allBatches = await client.batches.list();
+for (const batch of allBatches) {
+  console.log(batch);
+}
+```
+
+```shell
+# Cancel a batch
+curl -X POST "https://api.together.xyz/v1/batches/batch-abc123/cancel" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+
+# List all batches
+curl -X GET "https://api.together.xyz/v1/batches" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
 ```
 
 ## Status Flow
