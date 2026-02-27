@@ -13,11 +13,9 @@
 | Black Forest Labs | FLUX.2 [dev] | `black-forest-labs/FLUX.2-dev` | - |
 | Black Forest Labs | FLUX.2 [flex] | `black-forest-labs/FLUX.2-flex` | - |
 | Black Forest Labs | FLUX.1 [schnell] | `black-forest-labs/FLUX.1-schnell` | 4 |
-| Black Forest Labs | FLUX.1 [dev] | `black-forest-labs/FLUX.1-dev` | 28 |
 | Black Forest Labs | FLUX.1.1 [pro] | `black-forest-labs/FLUX.1.1-pro` | - |
 | Black Forest Labs | FLUX.1 Kontext [pro] | `black-forest-labs/FLUX.1-kontext-pro` | 28 |
 | Black Forest Labs | FLUX.1 Kontext [max] | `black-forest-labs/FLUX.1-kontext-max` | 28 |
-| Black Forest Labs | FLUX.1 Kontext [dev] | `black-forest-labs/FLUX.1-kontext-dev` | 28 |
 | Black Forest Labs | FLUX.1 Krea [dev] | `black-forest-labs/FLUX.1-krea-dev` | 28 |
 | ByteDance | Seedream 4.0 | `ByteDance-Seed/Seedream-4.0` | - |
 | ByteDance | Seedream 3.0 | `ByteDance-Seed/Seedream-3.0` | - |
@@ -40,7 +38,6 @@ All models above support text-to-image generation.
 ### Image Editing (Kontext)
 - `black-forest-labs/FLUX.1-kontext-pro` — Best quality editing
 - `black-forest-labs/FLUX.1-kontext-max` — Maximum capability
-- `black-forest-labs/FLUX.1-kontext-dev` — Development/testing
 - `google/flash-image-2.5` — Fast image editing
 - `google/gemini-3-pro-image` — Gemini-based editing
 

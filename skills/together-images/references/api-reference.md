@@ -18,6 +18,11 @@
 | `response_format` | string | No | url | `"base64"` for inline data, or URL |
 | `disable_safety_checker` | bool | No | false | Disable NSFW check |
 | `image_url` | string | No | - | Reference image URL (for editing) |
+| `reference_images` | array | No | - | Reference images for FLUX.2 image-to-image editing |
+| `guidance` | float | No | - | Guidance scale for FLUX.2 [dev] and [flex] models (e.g., 7.5) |
+| `prompt_upsampling` | bool | No | false | Automatically enhances prompts for FLUX.2 |
+| `output_format` | string | No | - | Output format -- `"jpeg"` or `"png"` for FLUX.2 models |
+| `image_loras` | array | No | - | Array of `{path, scale}` objects for applying LoRA adapters |
 
 *Required for all models except Kling
 
@@ -29,7 +34,7 @@ For Kontext models, provide a reference image and editing instructions:
 response = client.images.generate(
     model="black-forest-labs/FLUX.1-kontext-pro",
     prompt="Change the shirt color to blue",
-    image_url="https://example.com/photo.jpg",
+    image_url="https://cdn.pixabay.com/photo/2020/05/20/08/27/cat-5195431_1280.jpg",
     steps=28,
 )
 ```
@@ -41,7 +46,7 @@ const together = new Together();
 const response = await together.images.generate({
   model: "black-forest-labs/FLUX.1-kontext-pro",
   prompt: "Change the shirt color to blue",
-  image_url: "https://example.com/photo.jpg",
+  image_url: "https://cdn.pixabay.com/photo/2020/05/20/08/27/cat-5195431_1280.jpg",
   steps: 28,
 });
 console.log(response.data[0].url);
@@ -54,7 +59,7 @@ curl -X POST "https://api.together.xyz/v1/images/generations" \
   -d '{
     "model": "black-forest-labs/FLUX.1-kontext-pro",
     "prompt": "Change the shirt color to blue",
-    "image_url": "https://example.com/photo.jpg",
+    "image_url": "https://cdn.pixabay.com/photo/2020/05/20/08/27/cat-5195431_1280.jpg",
     "steps": 28
   }'
 ```

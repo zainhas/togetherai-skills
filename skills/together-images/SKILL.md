@@ -56,7 +56,7 @@ Transform existing images using a reference:
 response = client.images.generate(
     model="black-forest-labs/FLUX.1-kontext-pro",
     prompt="Transform this into a watercolor painting",
-    image_url="https://example.com/photo.jpg",
+    image_url="https://cdn.pixabay.com/photo/2020/05/20/08/27/cat-5195431_1280.jpg",
     width=1024,
     height=768,
 )
@@ -71,7 +71,7 @@ const response = await together.images.generate({
   width: 1024,
   height: 768,
   prompt: "Transform this into a watercolor painting",
-  image_url: "https://example.com/photo.jpg",
+  image_url: "https://cdn.pixabay.com/photo/2020/05/20/08/27/cat-5195431_1280.jpg",
 });
 ```
 
@@ -84,7 +84,7 @@ curl -X POST "https://api.together.xyz/v1/images/generations" \
     "width": 1024,
     "height": 768,
     "prompt": "Transform this into a watercolor painting",
-    "image_url": "https://example.com/photo.jpg"
+    "image_url": "https://cdn.pixabay.com/photo/2020/05/20/08/27/cat-5195431_1280.jpg"
   }'
 ```
 
