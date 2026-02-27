@@ -34,6 +34,31 @@ response = client.images.generate(
 )
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.images.generate({
+  model: "black-forest-labs/FLUX.1-kontext-pro",
+  prompt: "Change the shirt color to blue",
+  image_url: "https://example.com/photo.jpg",
+  steps: 28,
+});
+console.log(response.data[0].url);
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/images/generations" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "black-forest-labs/FLUX.1-kontext-pro",
+    "prompt": "Change the shirt color to blue",
+    "image_url": "https://example.com/photo.jpg",
+    "steps": 28
+  }'
+```
+
 ## Response
 
 ```json
@@ -100,7 +125,7 @@ print(response.data[0].url)
 ## TypeScript SDK
 
 ```typescript
-const response = await together.images.create({
+const response = await together.images.generate({
   prompt: "A sunset over mountains",
   model: "black-forest-labs/FLUX.1-schnell",
   width: 1024,

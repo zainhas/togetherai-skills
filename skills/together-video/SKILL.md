@@ -63,6 +63,23 @@ while (true) {
 }
 ```
 
+```shell
+# Create a video generation job
+curl -X POST "https://api.together.xyz/v1/videos" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "minimax/video-01-director",
+    "prompt": "A serene sunset over the ocean with gentle waves",
+    "width": 1366,
+    "height": 768
+  }'
+
+# Poll for completion (replace $JOB_ID with the id from the create response)
+curl -X GET "https://api.together.xyz/v1/videos/$JOB_ID" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
 ### Image-to-Video (Keyframes)
 
 ```python
@@ -76,6 +93,48 @@ job = client.videos.create(
     model="minimax/hailuo-02",
     frame_images=[{"input_image": img_data, "frame": 0}],
 )
+```
+
+```typescript
+import * as fs from "fs";
+import Together from "together-ai";
+const together = new Together();
+
+// Load and encode your image
+const imageBuffer = fs.readFileSync("keyframe.jpg");
+const base64Image = imageBuffer.toString("base64");
+
+const job = await together.videos.create({
+  prompt: "Smooth camera zoom out",
+  model: "minimax/hailuo-02",
+  frame_images: [{ input_image: base64Image, frame: 0 }],
+});
+
+// Poll until completion
+while (true) {
+  const status = await together.videos.retrieve(job.id);
+  if (status.status === "completed") {
+    console.log(`Video URL: ${status.outputs.video_url}`);
+    break;
+  } else if (status.status === "failed") break;
+  await new Promise(r => setTimeout(r, 5000));
+}
+```
+
+```shell
+# Create an image-to-video job (replace $BASE64_IMAGE with your base64-encoded image)
+curl -X POST "https://api.together.xyz/v1/videos" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "minimax/hailuo-02",
+    "prompt": "Smooth camera zoom out",
+    "frame_images": [{"input_image": "$BASE64_IMAGE", "frame": 0}]
+  }'
+
+# Poll for completion (replace $JOB_ID with the id from the create response)
+curl -X GET "https://api.together.xyz/v1/videos/$JOB_ID" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
 ```
 
 ### Reference Images

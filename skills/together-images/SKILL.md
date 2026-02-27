@@ -62,6 +62,32 @@ response = client.images.generate(
 )
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.images.generate({
+  model: "black-forest-labs/FLUX.1-kontext-pro",
+  width: 1024,
+  height: 768,
+  prompt: "Transform this into a watercolor painting",
+  image_url: "https://example.com/photo.jpg",
+});
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/images/generations" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "black-forest-labs/FLUX.1-kontext-pro",
+    "width": 1024,
+    "height": 768,
+    "prompt": "Transform this into a watercolor painting",
+    "image_url": "https://example.com/photo.jpg"
+  }'
+```
+
 ### Multiple Variations
 
 ```python
@@ -84,6 +110,29 @@ response = client.images.generate(
     response_format="base64",
 )
 print(response.data[0].b64_json)
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.images.generate({
+  model: "black-forest-labs/FLUX.1-schnell",
+  prompt: "a cat in outer space",
+  response_format: "base64",
+});
+console.log(response.data[0].b64_json);
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/images/generations" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "black-forest-labs/FLUX.1-schnell",
+    "prompt": "a cat in outer space",
+    "response_format": "base64"
+  }'
 ```
 
 ## Parameters

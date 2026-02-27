@@ -57,6 +57,37 @@ for i, item in enumerate(response.data):
     print(f"Text {i}: {len(item.embedding)} dimensions")
 ```
 
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const response = await together.embeddings.create({
+  model: "BAAI/bge-large-en-v1.5",
+  input: [
+    "First document",
+    "Second document",
+    "Third document",
+  ],
+});
+for (const item of response.data) {
+  console.log(`Index ${item.index}: ${item.embedding.length} dimensions`);
+}
+```
+
+```shell
+curl -X POST "https://api.together.xyz/v1/embeddings" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "BAAI/bge-large-en-v1.5",
+    "input": [
+      "First document",
+      "Second document",
+      "Third document"
+    ]
+  }'
+```
+
 ### Embedding Models
 
 | Model | API String | Dimensions | Max Input |
@@ -86,6 +117,29 @@ response = client.rerank.create(
 )
 for result in response.results:
     print(f"Index: {result.index}, Score: {result.relevance_score:.4f}")
+```
+
+```typescript
+import Together from "together-ai";
+const together = new Together();
+
+const documents = [
+  "Paris is the capital of France.",
+  "Berlin is the capital of Germany.",
+  "London is the capital of England.",
+  "The Eiffel Tower is in Paris.",
+];
+
+const response = await together.rerank.create({
+  model: "Salesforce/Llama-Rank-V1",
+  query: "What is the capital of France?",
+  documents,
+  top_n: 2,
+});
+
+for (const result of response.results) {
+  console.log(`Index: ${result.index}, Score: ${result.relevance_score}`);
+}
 ```
 
 ```shell
