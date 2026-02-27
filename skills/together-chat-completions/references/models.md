@@ -30,6 +30,9 @@
 | MiniMax | MiniMax M2.5 | `MiniMaxAI/MiniMax-M2.5` | 228,700 | FP4 |
 | DeepSeek | DeepSeek-V3.1 | `deepseek-ai/DeepSeek-V3.1` | 128,000 | FP8 |
 | DeepSeek | DeepSeek-R1 | `deepseek-ai/DeepSeek-R1` | 163,839 | FP8 |
+| DeepSeek | DeepSeek-R1 (throughput) | `deepseek-ai/DeepSeek-R1-0528-tput` | 163,839 | FP8 |
+| DeepSeek | R1 Distill Llama 70B | `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` | 131,072 | - |
+| DeepSeek | R1 Distill Qwen 14B | `deepseek-ai/DeepSeek-R1-Distill-Qwen-14B` | 32,768 | - |
 | OpenAI | GPT-OSS 120B | `openai/gpt-oss-120b` | 128,000 | MXFP4 |
 | OpenAI | GPT-OSS 20B | `openai/gpt-oss-20b` | 128,000 | MXFP4 |
 | Z.ai | GLM-5 | `zai-org/GLM-5` | 202,752 | FP4 |
@@ -47,6 +50,7 @@
 | Mistral | Mistral 7B v0.2 | `mistralai/Mistral-7B-Instruct-v0.2` | 32,768 | FP16 |
 | NVIDIA | Nemotron Nano 9B v2 | `nvidia/NVIDIA-Nemotron-Nano-9B-v2` | 131,072 | BF16 |
 | Google | Gemma 3N E4B | `google/gemma-3n-E4B-it` | 32,768 | FP8 |
+| Qwen | QwQ 32B | `Qwen/QwQ-32B` | 32,768 | - |
 | Qwen | Qwen 2.5 7B Turbo | `Qwen/Qwen2.5-7B-Instruct-Turbo` | 32,768 | FP8 |
 | Marin | Marin 8B Instruct | `marin-community/marin-8b-instruct` | 4,096 | FP16 |
 | Essential AI | Rnj-1 Instruct | `essentialai/rnj-1-instruct` | 32,768 | BF16 |

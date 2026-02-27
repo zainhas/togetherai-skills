@@ -1,6 +1,6 @@
 ---
 name: together-chat-completions
-description: Serverless chat and text completion inference via Together AI's OpenAI-compatible API. Access 100+ open-source models with pay-per-token pricing. Includes function calling (tool use), structured outputs (JSON mode, json_schema, regex), and reasoning models (DeepSeek R1, Qwen3 Thinking, Kimi K2). Use when building chat applications, text generation, multi-turn conversations, function calling, structured JSON outputs, reasoning/chain-of-thought, or any LLM inference task using Together AI.
+description: Serverless chat and text completion inference via Together AI's OpenAI-compatible API. Access 100+ open-source models with pay-per-token pricing. Includes function calling (tool use) with 6 calling patterns, structured outputs (JSON mode, json_schema, regex), and reasoning/thinking models (DeepSeek R1, Qwen3 Thinking, Kimi K2). Use when building chat applications, text generation, multi-turn conversations, function calling, structured JSON outputs, reasoning/chain-of-thought, thinking mode toggle, or any LLM inference task using Together AI.
 ---
 
 # Together Chat Completions
@@ -336,6 +336,13 @@ response = client.chat.completions.create(
 )
 ```
 
+### Qwen3 Thinking Toggle
+
+Toggle thinking on/off by choosing the model variant:
+
+- **Thinking enabled:** `Qwen/Qwen3-235B-A22B-Thinking-2507`
+- **Thinking disabled (faster, cheaper):** `Qwen/Qwen3-235B-A22B-Instruct-2507-tput`
+
 ### Parse Thinking vs Answer
 
 ```python
@@ -357,9 +364,15 @@ answer = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
 
 - **Model catalog and specs**: See [references/models.md](references/models.md)
 - **Full parameter reference**: See [references/api-parameters.md](references/api-parameters.md)
-- **Function calling patterns (detailed)**: See the `together-function-calling` skill for in-depth patterns and structured output model lists
-- **Reasoning model details**: See the `together-reasoning` skill for extended model info and Qwen3 thinking toggle
+- **Function calling patterns (detailed)**: See [references/function-calling-patterns.md](references/function-calling-patterns.md)
+- **Structured output details**: See [references/structured-outputs.md](references/structured-outputs.md)
+- **Reasoning model details**: See [references/reasoning-models.md](references/reasoning-models.md)
+- **Runnable script**: See [scripts/tool_call_loop.py](scripts/tool_call_loop.py) — tool call loop with parallel call handling (v2 SDK)
 - **Official docs**: [Chat Overview](https://docs.together.ai/docs/chat-overview)
 - **Official docs**: [Inference Parameters](https://docs.together.ai/docs/inference-parameters)
 - **Official docs**: [Serverless Models](https://docs.together.ai/docs/serverless-models)
+- **Official docs**: [Function Calling](https://docs.together.ai/docs/function-calling)
+- **Official docs**: [JSON Mode](https://docs.together.ai/docs/json-mode)
+- **Official docs**: [Reasoning Overview](https://docs.together.ai/docs/reasoning-overview)
+- **Official docs**: [DeepSeek R1](https://docs.together.ai/docs/deepseek-r1)
 - **API reference**: [Chat Completions API](https://docs.together.ai/reference/chat-completions)
