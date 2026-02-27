@@ -10,109 +10,363 @@ uv tool install together
 
 Jig commands are under `together beta jig`.
 
-## Commands
+## Environment Variables
 
-### Deploy
-Build, push, and deploy container:
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TOGETHER_API_KEY` | Required | Your Together API key |
+| `TOGETHER_DEBUG` | `""` | Enable debug logging (`"1"` or `"true"`) |
+| `WARMUP_ENV_NAME` | `TORCHINDUCTOR_CACHE_DIR` | Environment variable for cache location |
+| `WARMUP_DEST` | `torch_cache` | Cache directory path in container |
+
+All commands are subcommands of `together beta jig`. Use `--config <path>` to specify a custom config file (default: `pyproject.toml`).
+
+## Build Commands
+
+### jig init
+
+Create a starter `pyproject.toml` with sensible defaults.
+
 ```shell
-together beta jig deploy
+together beta jig init
 ```
-Reads `pyproject.toml` for build and deploy configuration.
 
-### Status
-Check deployment status:
+### jig dockerfile
+
+Generate a Dockerfile from your `pyproject.toml` configuration. Useful for debugging the build.
+
+```shell
+together beta jig dockerfile
+```
+
+### jig build
+
+Build the Docker image locally.
+
+```shell
+together beta jig build [flags]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--tag <tag>` | Image tag (default: content-hash) |
+| `--warmup` | Pre-generate compile caches after build (requires GPU) |
+
+### jig push
+
+Push the built image to Together's registry at `registry.together.xyz`.
+
+```shell
+together beta jig push [flags]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--tag <tag>` | Image tag to push |
+
+## Deployment Commands
+
+### jig deploy
+
+Build, push, and create or update the deployment. Combines `build`, `push`, and deployment creation into one step.
+
+```shell
+together beta jig deploy [flags]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--tag <tag>` | Image tag |
+| `--warmup` | Pre-generate compile caches (requires GPU) |
+| `--build-only` | Build and push only, skip deployment creation |
+| `--image <ref>` | Deploy an existing image, skip build and push |
+
+### jig status
+
+Show deployment status and configuration.
+
 ```shell
 together beta jig status
 ```
 
-### Logs
-View container logs:
+### jig list
+
+List all deployments in your organization.
+
 ```shell
-together beta jig logs
-together beta jig logs --follow
+together beta jig list
 ```
 
-### Destroy
-Tear down deployment:
+### jig logs
+
+Retrieve deployment logs.
+
+```shell
+together beta jig logs [flags]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--follow` | Stream logs in real-time |
+
+### jig endpoint
+
+Print the deployment's endpoint URL.
+
+```shell
+together beta jig endpoint
+```
+
+### jig destroy
+
+Delete the deployment.
+
 ```shell
 together beta jig destroy
 ```
 
-### Secrets
-Manage encrypted runtime secrets:
+## Queue Commands
+
+### jig submit
+
+Submit a job to the deployment's queue.
+
 ```shell
-together beta jig secrets set --name HF_TOKEN --value hf_xxxxx
-together beta jig secrets list
-together beta jig secrets delete --name HF_TOKEN
+together beta jig submit [flags]
 ```
 
-### Volumes
-Manage persistent storage:
+| Flag | Description |
+|------|-------------|
+| `--prompt <text>` | Shorthand for `--payload '{"prompt": "..."}'` |
+| `--payload <json>` | Full JSON payload |
+| `--watch` | Wait for the job to complete and print the result |
+
+Example:
+
 ```shell
-together beta jig volumes create --name my-weights --source ./model_weights/
-together beta jig volumes list
-together beta jig volumes delete --name my-weights
+together beta jig submit --payload '{"prompt": "A cat playing piano"}' --watch
 ```
 
-### Queue Status
-Check queue metrics:
+### jig job_status
+
+Get the status of a submitted job.
+
+```shell
+together beta jig job_status --request-id <id>
+```
+
+| Flag | Description |
+|------|-------------|
+| `--request-id <id>` | The job's request ID (required) |
+
+### jig queue_status
+
+Show queue backlog and worker status.
+
 ```shell
 together beta jig queue_status
 ```
 
+## Queue REST API (cURL)
+
+Submit a job:
+
+```shell
+curl -X POST "https://api.together.ai/v1/queue/submit" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "my-deployment",
+    "payload": {"prompt": "Hello world"},
+    "priority": 1
+  }'
+```
+
+Poll job status:
+
+```shell
+curl "https://api.together.ai/v1/queue/status?model=my-deployment&request_id=req_abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+Check health endpoint:
+
+```shell
+curl https://api.together.ai/v1/deployments/my-deployment/health \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+## Secrets Commands
+
+Secrets are encrypted environment variables injected at runtime.
+
+### jig secrets set
+
+```shell
+together beta jig secrets set --name <name> --value <value> [flags]
+```
+
+| Flag | Description |
+|------|-------------|
+| `--name <name>` | Secret name (required) |
+| `--value <value>` | Secret value (required) |
+| `--description <text>` | Human-readable description |
+
+Example:
+
+```shell
+together beta jig secrets set --name HF_TOKEN --value hf_xxxxx --description "Hugging Face token"
+```
+
+### jig secrets list
+
+List all secrets for the deployment.
+
+```shell
+together beta jig secrets list
+```
+
+### jig secrets unset
+
+Remove a secret.
+
+```shell
+together beta jig secrets unset <name>
+```
+
+## Volumes Commands
+
+Volumes mount read-only data (such as model weights) into your container without baking them into the image.
+
+### jig volumes create
+
+Create a volume and upload files.
+
+```shell
+together beta jig volumes create --name <name> --source <path>
+```
+
+| Flag | Description |
+|------|-------------|
+| `--name <name>` | Volume name (required) |
+| `--source <path>` | Local directory to upload (required) |
+
+Example:
+
+```shell
+together beta jig volumes create --name my-weights --source ./model_weights/
+```
+
+### jig volumes update
+
+Update a volume with new files.
+
+```shell
+together beta jig volumes update --name <name> --source <path>
+```
+
+### jig volumes describe
+
+Show volume details and contents.
+
+```shell
+together beta jig volumes describe --name <name>
+```
+
+### jig volumes list
+
+List all volumes.
+
+```shell
+together beta jig volumes list
+```
+
+### jig volumes delete
+
+Delete a volume.
+
+```shell
+together beta jig volumes delete --name <name>
+```
+
+Mount a volume by adding to your `pyproject.toml`:
+
+```toml
+[[tool.jig.volume_mounts]]
+name = "my-weights"
+mount_path = "/models"
+```
+
 ## Configuration (pyproject.toml)
 
-### `[tool.jig.image]` — Build Settings
+Jig reads configuration from your `pyproject.toml` file or a standalone `jig.toml` file. You can also specify a custom config file explicitly:
+
+```shell
+together beta jig --config staging_jig.toml deploy
+```
+
+This is useful for managing multiple environments (e.g., `staging_jig.toml`, `production_jig.toml`).
+
+### `[tool.jig.image]` -- Build Settings
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `python_version` | string | `"3.11"` | Python version |
-| `system_packages` | string[] | `[]` | APT packages (e.g., `ffmpeg`, `git`) |
-| `environment` | object | `{}` | Build-time + runtime env vars |
-| `run` | string[] | `[]` | Extra shell commands during build |
-| `cmd` | string | `"python app.py"` | Container startup command |
-| `copy` | string[] | `[]` | Files to include in container |
-| `auto_include_git` | bool | false | Auto-include git-tracked files |
+| `python_version` | string | `"3.11"` | Python version for the container base image |
+| `system_packages` | string[] | `[]` | APT packages to install (e.g., `ffmpeg`, `git`, `libgl1`) |
+| `environment` | object | `{}` | Build-time + runtime env vars (set as `ENV` directives) |
+| `run` | string[] | `[]` | Extra shell commands during build (each becomes a `RUN` instruction) |
+| `cmd` | string | `"python app.py"` | Container startup command (Docker `CMD`). Include `--queue` for Sprocket |
+| `copy` | string[] | `[]` | Files and directories to include in container |
+| `auto_include_git` | bool | `false` | Auto-include git-tracked files (requires clean repo) |
 
-### `[tool.jig.deploy]` — Runtime Settings
+### `[tool.jig.deploy]` -- Runtime Settings
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `description` | string | - | Human-readable description |
-| `gpu_type` | string | `"h100-80gb"` | `"h100-80gb"` or `"none"` |
-| `gpu_count` | int | 1 | GPUs per replica |
-| `cpu` | float | 1.0 | CPU cores per replica |
-| `memory` | float | 8.0 | Memory in GB |
-| `storage` | int | 100 | Ephemeral disk in GB |
-| `min_replicas` | int | 1 | Min replicas (0 for scale-to-zero) |
-| `max_replicas` | int | 1 | Max replicas |
-| `port` | int | 8000 | Container listen port |
-| `health_check_path` | string | `"/health"` | Health endpoint |
-| `termination_grace_period_seconds` | int | 300 | Shutdown timeout |
-| `command` | string | - | Override startup command |
+| `description` | string | `""` | Human-readable description |
+| `gpu_type` | string | `"h100-80gb"` | `"h100-80gb"` or `"none"` (CPU-only) |
+| `gpu_count` | int | `1` | GPUs per replica |
+| `cpu` | float | `1.0` | CPU cores per replica (supports fractional, e.g. `0.1`) |
+| `memory` | float | `8.0` | Memory in GB (supports fractional, e.g. `0.5`) |
+| `storage` | int | `100` | Ephemeral disk in GB |
+| `min_replicas` | int | `1` | Min replicas (0 for scale-to-zero) |
+| `max_replicas` | int | `1` | Max replicas |
+| `port` | int | `8000` | Container listen port |
+| `health_check_path` | string | `"/health"` | Health endpoint (must return 200 when ready) |
+| `termination_grace_period_seconds` | int | `300` | Shutdown timeout for in-flight jobs |
+| `command` | string | `null` | Override startup command at deploy time |
 
 ### `[tool.jig.deploy.environment_variables]`
-Runtime environment variables:
+
+Runtime environment variables injected into your container. For sensitive values, use secrets instead.
+
 ```toml
 [tool.jig.deploy.environment_variables]
 MODEL_PATH = "/models/weights"
 TORCH_COMPILE = "1"
+LOG_LEVEL = "INFO"
 ```
 
 ### `[tool.jig.autoscaling]`
+
 ```toml
 [tool.jig.autoscaling]
 profile = "QueueBacklogPerWorker"
-targetValue = "1.05"  # 5% underprovisioning (recommended)
+targetValue = "1.05"
 ```
 
-- `"1.0"` — Exact match (queue_depth = workers)
-- `"1.05"` — 5% underprovisioning (recommended)
-- `"0.9"` — 10% overprovisioning (lower latency)
+The `QueueBacklogPerWorker` profile scales based on queue depth relative to worker count.
 
 Formula: `desired_replicas = queue_depth / targetValue`
 
+| targetValue | Behavior | Example (100 jobs) |
+|-------------|----------|-------------------|
+| `"1.0"` | Exact match | 100 workers |
+| `"1.05"` | 5% underprovisioning (recommended) | 95 workers |
+| `"0.9"` | 10% overprovisioning (lower latency) | 111 workers |
+
 ### `[[tool.jig.volume_mounts]]`
+
 ```toml
 [[tool.jig.volume_mounts]]
 name = "my-weights"
@@ -131,6 +385,7 @@ dependencies = ["torch>=2.0", "diffusers", "sprocket"]
 [tool.jig.image]
 python_version = "3.11"
 system_packages = ["git", "ffmpeg", "libgl1"]
+environment = { TORCH_CUDA_ARCH_LIST = "8.0 9.0" }
 run = ["pip install flash-attn --no-build-isolation"]
 cmd = "python app.py --queue"
 copy = ["app.py", "models/"]
@@ -146,6 +401,10 @@ max_replicas = 20
 port = 8000
 health_check_path = "/health"
 
+[tool.jig.deploy.environment_variables]
+MODEL_PATH = "/models/weights"
+TORCH_COMPILE = "1"
+
 [[tool.jig.volume_mounts]]
 name = "my-weights"
 mount_path = "/models"
@@ -156,12 +415,14 @@ targetValue = "1.05"
 ```
 
 ## Container Registry
+
 - **Host:** `registry.together.xyz`
 - Private to your organization
 - Images referenced by digest for reproducibility
 - Authentication handled automatically by Jig CLI
 
 ## Debug Mode
+
 ```shell
 export TOGETHER_DEBUG=1
 together beta jig deploy

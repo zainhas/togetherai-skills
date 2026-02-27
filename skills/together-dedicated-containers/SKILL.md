@@ -74,15 +74,75 @@ jig logs                     # View logs
 
 ### 5. Send Requests
 
+Check the health endpoint:
+
+```shell
+curl https://api.together.ai/v1/deployments/my-inference-service/health \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+Submit a job via the Queue API:
+
+```shell
+curl -X POST "https://api.together.ai/v1/queue/submit" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "my-inference-service",
+    "payload": {"prompt": "Hello world"},
+    "priority": 1
+  }'
+```
+
+Response:
+
+```json
+{
+  "request_id": "req_abc123",
+  "status": "pending"
+}
+```
+
+Poll for the result:
+
+```shell
+curl "https://api.together.ai/v1/queue/status?model=my-inference-service&request_id=req_abc123" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+Response (when complete):
+
+```json
+{
+  "request_id": "req_abc123",
+  "model": "my-inference-service",
+  "status": "done",
+  "outputs": {"output": "..."}
+}
+```
+
+Or use the Python `requests` library:
+
 ```python
+import os
 import requests
 
 response = requests.post(
-    "https://api.together.xyz/v1/deployments/my-inference-service/predict",
-    headers={"Authorization": "Bearer $TOGETHER_API_KEY"},
-    json={"prompt": "Hello world"},
+    "https://api.together.ai/v1/queue/submit",
+    headers={"Authorization": f"Bearer {os.environ['TOGETHER_API_KEY']}"},
+    json={
+        "model": "my-inference-service",
+        "payload": {"prompt": "Hello world"},
+        "priority": 1,
+    },
 )
 print(response.json())
+```
+
+Or submit directly via the Jig CLI:
+
+```shell
+together beta jig submit --payload '{"prompt": "Hello world"}' --watch
 ```
 
 ## Sprocket SDK
@@ -103,16 +163,60 @@ For async workloads, use the Queue API for job submission with:
 
 ## Key Jig CLI Commands
 
+All commands are subcommands of `together beta jig`. Use `--config <path>` to specify a custom config file (default: `pyproject.toml`).
+
+### Build and Deploy
+
 | Command | Description |
 |---------|-------------|
-| `jig auth login` | Authenticate |
-| `jig build` | Build container image |
-| `jig push` | Push to registry |
-| `jig deploy` | Deploy to GPU infrastructure |
-| `jig status` | Check deployment status |
+| `jig init` | Create a starter `pyproject.toml` with defaults |
+| `jig dockerfile` | Generate a Dockerfile from config (for debugging) |
+| `jig build` | Build container image locally |
+| `jig build --tag <tag>` | Build with a specific image tag |
+| `jig build --warmup` | Build and pre-generate compile caches (requires GPU) |
+| `jig push` | Push image to `registry.together.xyz` |
+| `jig deploy` | Build, push, and create/update deployment |
+| `jig deploy --build-only` | Build and push only, skip deployment creation |
+| `jig deploy --image <ref>` | Deploy an existing image, skip build and push |
+
+### Deployment Management
+
+| Command | Description |
+|---------|-------------|
+| `jig status` | Show deployment status and configuration |
+| `jig list` | List all deployments in your organization |
 | `jig logs` | View deployment logs |
-| `jig scale` | Scale replicas |
-| `jig secrets set` | Manage secrets |
+| `jig logs --follow` | Stream logs in real-time |
+| `jig endpoint` | Print the deployment's endpoint URL |
+| `jig destroy` | Delete the deployment |
+
+### Queue
+
+| Command | Description |
+|---------|-------------|
+| `jig submit --payload '<json>'` | Submit a job to the queue |
+| `jig submit --prompt '<text>'` | Submit with shorthand prompt payload |
+| `jig submit --watch` | Submit and wait for the result |
+| `jig job_status --request-id <id>` | Get the status of a submitted job |
+| `jig queue_status` | Show queue backlog and worker status |
+
+### Secrets
+
+| Command | Description |
+|---------|-------------|
+| `jig secrets set --name <n> --value <v>` | Create or update a secret |
+| `jig secrets list` | List all secrets for the deployment |
+| `jig secrets unset <name>` | Remove a secret |
+
+### Volumes
+
+| Command | Description |
+|---------|-------------|
+| `jig volumes create --name <n> --source <path>` | Create a volume and upload files |
+| `jig volumes update --name <n> --source <path>` | Update a volume with new files |
+| `jig volumes describe --name <n>` | Show volume details and contents |
+| `jig volumes list` | List all volumes |
+| `jig volumes delete --name <n>` | Delete a volume |
 
 ## Resources
 
