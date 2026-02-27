@@ -33,6 +33,33 @@ response = client.audio.speech.create(
 response.stream_to_file("speech.mp3")
 ```
 
+```typescript
+import Together from "together-ai";
+import { Readable } from "stream";
+import { createWriteStream } from "fs";
+
+const together = new Together();
+
+async function generateAudio() {
+  const res = await together.audio.create({
+    input: "Today is a wonderful day to build something people love!",
+    voice: "tara",
+    response_format: "mp3",
+    sample_rate: 44100,
+    stream: false,
+    model: "canopylabs/orpheus-3b-0.1-ft",
+  });
+
+  if (res.body) {
+    const nodeStream = Readable.from(res.body as ReadableStream);
+    const fileStream = createWriteStream("./speech.mp3");
+    nodeStream.pipe(fileStream);
+  }
+}
+
+generateAudio();
+```
+
 ```shell
 curl -X POST "https://api.together.xyz/v1/audio/speech" \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
@@ -53,6 +80,32 @@ response = client.audio.speech.create(
     response_encoding="pcm_s16le",
 )
 response.stream_to_file("speech.wav", response_format="wav")
+```
+
+```typescript
+import Together from "together-ai";
+
+const together = new Together();
+
+async function streamAudio() {
+  const response = await together.audio.speech.create({
+    model: "canopylabs/orpheus-3b-0.1-ft",
+    input: "The quick brown fox jumps over the lazy dog",
+    voice: "tara",
+    stream: true,
+    response_format: "raw",
+    response_encoding: "pcm_s16le",
+  });
+
+  const chunks = [];
+  for await (const chunk of response) {
+    chunks.push(chunk);
+  }
+
+  console.log("Streaming complete!");
+}
+
+streamAudio();
 ```
 
 ### WebSocket (Lowest Latency)
@@ -123,6 +176,19 @@ response = client.audio.transcriptions.create(
     file=open("audio.mp3", "rb"),
 )
 print(response.text)
+```
+
+```typescript
+import Together from "together-ai";
+
+const together = new Together();
+
+const transcription = await together.audio.transcriptions.create({
+  file: "path/to/audio.mp3",
+  model: "openai/whisper-large-v3",
+  language: "en",
+});
+console.log(transcription.text);
 ```
 
 ```shell

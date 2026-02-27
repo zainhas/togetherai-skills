@@ -80,6 +80,61 @@ OpenAI-Beta: realtime=v1
 {"type": "error", "message": "..."}
 ```
 
+## Transcription with Timestamps
+
+Get word-level timing information using `verbose_json` response format:
+
+```python
+response = client.audio.transcriptions.create(
+    file="audio.mp3",
+    model="openai/whisper-large-v3",
+    response_format="verbose_json",
+    timestamp_granularities="word",
+)
+
+print(f"Text: {response.text}")
+print(f"Duration: {response.duration}s")
+
+if response.words:
+    for word in response.words:
+        print(f"'{word.word}' [{word.start:.2f}s - {word.end:.2f}s]")
+```
+
+```typescript
+import Together from "together-ai";
+
+const together = new Together();
+
+const response = await together.audio.transcriptions.create({
+  file: "meeting_recording.mp3",
+  model: "openai/whisper-large-v3",
+  language: "en",
+  response_format: "json",
+});
+
+console.log(`Transcription: ${response.text}`);
+```
+
+### Speaker Diarization
+
+```typescript
+import Together from "together-ai";
+
+const together = new Together();
+
+async function transcribeWithDiarization() {
+  const response = await together.audio.transcriptions.create({
+    file: "meeting.mp3",
+    model: "openai/whisper-large-v3",
+    diarize: true,
+  });
+
+  console.log(`Speaker Segments: ${response.speaker_segments}\n`);
+}
+
+transcribeWithDiarization();
+```
+
 ## Translation
 
 Translates any language to English:
@@ -90,6 +145,18 @@ response = client.audio.translations.create(
     model="openai/whisper-large-v3",
 )
 print(response.text)  # English translation
+```
+
+```typescript
+import Together from "together-ai";
+
+const together = new Together();
+
+const translation = await together.audio.translations.create({
+  file: "french_audio.mp3",
+  model: "openai/whisper-large-v3",
+});
+console.log(`English translation: ${translation.text}`);
 ```
 
 ## Input Methods

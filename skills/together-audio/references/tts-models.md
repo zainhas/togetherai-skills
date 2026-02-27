@@ -56,8 +56,34 @@ Regional voices: `german conversational woman`, `french conversational lady`, `i
 `English_DeterminedMan`, `English_Diligent_Man`, `English_expressive_narrator`, `English_FriendlyNeighbor`, `English_Graceful_Lady`, `Japanese_GentleButler`
 
 Query the full list via API:
+
 ```python
 response = client.audio.voices.list()
+```
+
+```typescript
+import fetch from "node-fetch";
+
+async function getVoices() {
+  const apiKey = process.env.TOGETHER_API_KEY;
+  const model = "canopylabs/orpheus-3b-0.1-ft";
+  const url = `https://api.together.xyz/v1/voices?model=${model}`;
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+  });
+
+  const data = await response.json();
+
+  console.log(`Available voices for ${model}:`);
+  for (const voice of data.voices || []) {
+    console.log(voice.name || "Unknown voice");
+  }
+}
+
+getVoices();
 ```
 
 ## Parameters
@@ -96,3 +122,79 @@ response = client.audio.voices.list()
 - `conversation.item.audio_output.delta` — Audio chunk (base64)
 - `conversation.item.audio_output.done` — Generation complete
 - `conversation.item.tts.failed` — Error
+
+### WebSocket Example (TypeScript)
+
+```typescript
+import WebSocket from "ws";
+import fs from "fs";
+
+const apiKey = process.env.TOGETHER_API_KEY;
+const url =
+  "wss://api.together.ai/v1/audio/speech/websocket?model=hexgrad/Kokoro-82M&voice=af_alloy";
+
+const ws = new WebSocket(url, {
+  headers: {
+    Authorization: `Bearer ${apiKey}`,
+  },
+});
+
+const audioData: Buffer[] = [];
+
+ws.on("open", () => {
+  console.log("WebSocket connection established!");
+});
+
+ws.on("message", (data) => {
+  const message = JSON.parse(data.toString());
+
+  if (message.type === "session.created") {
+    console.log(`Session created: ${message.session.id}`);
+
+    const textChunks = [
+      "Hello, this is a test.",
+      "This is the second sentence.",
+      "And this is the final one.",
+    ];
+
+    textChunks.forEach((text, index) => {
+      setTimeout(() => {
+        ws.send(
+          JSON.stringify({
+            type: "input_text_buffer.append",
+            text: text,
+          })
+        );
+      }, index * 500);
+    });
+
+    setTimeout(() => {
+      ws.send(JSON.stringify({ type: "input_text_buffer.commit" }));
+    }, textChunks.length * 500 + 100);
+  } else if (message.type === "conversation.item.input_text.received") {
+    console.log(`Text received: ${message.text}`);
+  } else if (message.type === "conversation.item.audio_output.delta") {
+    const audioChunk = Buffer.from(message.delta, "base64");
+    audioData.push(audioChunk);
+    console.log(`Received audio chunk for item ${message.item_id}`);
+  } else if (message.type === "conversation.item.audio_output.done") {
+    console.log(`Audio generation complete for item ${message.item_id}`);
+  } else if (message.type === "conversation.item.tts.failed") {
+    const errorMessage = message.error?.message ?? "Unknown error";
+    console.error(`Error: ${errorMessage}`);
+    ws.close();
+  }
+});
+
+ws.on("close", () => {
+  if (audioData.length > 0) {
+    const completeAudio = Buffer.concat(audioData);
+    fs.writeFileSync("output.wav", completeAudio);
+    console.log("Audio saved to output.wav");
+  }
+});
+
+ws.on("error", (error) => {
+  console.error("WebSocket error:", error);
+});
+```
