@@ -24,48 +24,150 @@ Provision GPU clusters on Together AI for distributed training, large-scale infe
 5. Monitor health and manage nodes
 6. Delete when done
 
-## Quick Start with tcloud CLI
+## Quick Start with CLI
+
+The CLI supports two equivalent command forms. The examples below use `together beta clusters`, but you can also use `tcloud cluster` after installing `tcloud`.
 
 ### Install
 
 ```shell
-pip install tcloud
-tcloud auth login
+# Option A: Together CLI (included with Together Python SDK)
+pip install together
+
+# Option B: Standalone tcloud binary
+# Mac (Universal)
+curl -LO https://tcloud-cli-downloads.s3.us-west-2.amazonaws.com/releases/latest/tcloud-darwin-universal.tar.gz
+tar xzf tcloud-darwin-universal.tar.gz
+
+# Linux (AMD64)
+curl -LO https://tcloud-cli-downloads.s3.us-west-2.amazonaws.com/releases/latest/tcloud-linux-amd64.tar.gz
+tar xzf tcloud-linux-amd64.tar.gz
+```
+
+### Authenticate
+
+```shell
+# Together CLI
+together auth login
+
+# tcloud
+tcloud sso login
+```
+
+### List Available Regions
+
+```shell
+together beta clusters list-regions
+```
+
+Example output:
+
+```json
+{
+    "regions": [
+        {
+            "driver_versions": [
+                "CUDA_12_6_565",
+                "CUDA_12_5_555",
+                "CUDA_12_8_570",
+                "CUDA_12_9_575",
+                "CUDA_12_6_560",
+                "CUDA_12_4_550"
+            ],
+            "name": "us-central-8",
+            "supported_instance_types": [
+                "H100_SXM",
+                "H200_SXM"
+            ]
+        }
+    ]
+}
 ```
 
 ### Create a Cluster
 
 ```shell
-tcloud cluster create \
+# On-demand Kubernetes cluster
+together beta clusters create \
   --name my-training-cluster \
-  --gpu-type h100 \
-  --num-nodes 8 \
-  --orchestrator kubernetes
+  --num-gpus 8 \
+  --gpu-type H100_SXM \
+  --region us-central-8 \
+  --driver-version CUDA_12_6_560 \
+  --billing-type ON_DEMAND \
+  --cluster-type KUBERNETES
+
+# Reserved Slurm cluster with shared storage
+together beta clusters create \
+  --name my-slurm-cluster \
+  --num-gpus 16 \
+  --gpu-type H200_SXM \
+  --region us-central-8 \
+  --driver-version CUDA_12_6_560 \
+  --billing-type RESERVED \
+  --duration-days 30 \
+  --cluster-type SLURM \
+  --volume <VOLUME_ID>
 ```
 
 ### Check Status
 
 ```shell
-tcloud cluster list
-tcloud cluster get my-training-cluster
+together beta clusters list
+together beta clusters retrieve <CLUSTER_ID>
 ```
 
-### Access the Cluster
+### Scale a Cluster
 
 ```shell
-# Get kubeconfig for Kubernetes clusters
-tcloud cluster kubeconfig my-training-cluster > kubeconfig.yaml
-export KUBECONFIG=kubeconfig.yaml
+together beta clusters update <CLUSTER_ID> --num-gpus 16
+```
+
+### Get Credentials (Kubernetes)
+
+```shell
+# Write kubeconfig to default location (~/.kube/config)
+together beta clusters get-credentials <CLUSTER_ID>
+
+# Write to a specific file
+together beta clusters get-credentials <CLUSTER_ID> --file ./kubeconfig.yaml
+
+# Print to stdout
+together beta clusters get-credentials <CLUSTER_ID> --file -
+
+# Overwrite existing context and set as default
+together beta clusters get-credentials <CLUSTER_ID> \
+  --overwrite-existing \
+  --set-default-context
+
+# Then use kubectl
+export KUBECONFIG=~/.kube/config
 kubectl get nodes
-
-# SSH for Slurm clusters
-tcloud cluster ssh my-training-cluster
 ```
 
-### Delete
+### Create and Manage Shared Storage
 
 ```shell
-tcloud cluster delete my-training-cluster
+# Create a shared volume
+together beta clusters storage create \
+  --volume-name my-shared-data \
+  --size-tib 2 \
+  --region us-central-8
+
+# List all volumes
+together beta clusters storage list
+
+# Get volume details
+together beta clusters storage retrieve <VOLUME_ID>
+
+# Delete a volume (must not be attached to a cluster)
+together beta clusters storage delete <VOLUME_ID>
+```
+
+### Delete a Cluster
+
+```shell
+together beta clusters delete <CLUSTER_ID>
 ```
 
 ## Kubernetes vs Slurm
@@ -81,17 +183,21 @@ tcloud cluster delete my-training-cluster
 - Familiar with Slurm job scripts
 - Need fine-grained resource allocation
 
-## Key tcloud Commands
+## Key CLI Commands
 
-| Command | Description |
-|---------|-------------|
-| `tcloud cluster create` | Create a new cluster |
-| `tcloud cluster list` | List all clusters |
-| `tcloud cluster get <name>` | Get cluster details |
-| `tcloud cluster delete <name>` | Delete a cluster |
-| `tcloud cluster kubeconfig <name>` | Get K8s kubeconfig |
-| `tcloud cluster ssh <name>` | SSH into Slurm head node |
-| `tcloud cluster health <name>` | Check node health |
+| `together beta clusters` | `tcloud cluster` | Description |
+|--------------------------|-------------------|-------------|
+| `clusters create` | `cluster create` | Create a new cluster |
+| `clusters list` | `cluster list` | List all clusters |
+| `clusters retrieve <ID>` | `cluster get <ID>` | Get cluster details |
+| `clusters update <ID>` | `cluster scale <ID>` | Update/scale a cluster |
+| `clusters delete <ID>` | `cluster delete <ID>` | Delete a cluster |
+| `clusters list-regions` | -- | List regions and GPU types |
+| `clusters get-credentials <ID>` | -- | Get K8s kubeconfig |
+| `clusters storage create` | -- | Create shared volume |
+| `clusters storage list` | -- | List shared volumes |
+| `clusters storage retrieve <ID>` | -- | Get volume details |
+| `clusters storage delete <ID>` | -- | Delete shared volume |
 
 ## Terraform Integration
 

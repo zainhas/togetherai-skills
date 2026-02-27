@@ -133,20 +133,150 @@ scontrol show job <jobid>
 
 ## REST API
 
+Base URL: `https://api.together.ai/v1`
+
+### Create a Cluster
+
 ```shell
-# Create cluster
-curl -X POST "https://manager.cloud.together.ai/api/v1/gpu_cluster" \
+curl -X POST \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "my-cluster", "num_gpus": 8, "instance_type": "H100-SXM", ...}'
+  --data '{
+    "cluster_name": "my-gpu-cluster",
+    "region": "us-central-8",
+    "gpu_type": "H100_SXM",
+    "num_gpus": 8,
+    "driver_version": "CUDA_12_6_560",
+    "billing_type": "ON_DEMAND"
+  }' \
+  https://api.together.ai/v1/compute/clusters
+```
 
-# List clusters
-curl -X GET "https://manager.cloud.together.ai/api/v1/gpu_clusters" \
-  -H "Authorization: Bearer $TOGETHER_API_KEY"
+Request body fields:
 
-# Delete cluster
-curl -X DELETE "https://manager.cloud.together.ai/api/v1/gpu_cluster/{id}" \
-  -H "Authorization: Bearer $TOGETHER_API_KEY"
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `cluster_name` | string | Yes | Name of the cluster |
+| `region` | string | Yes | Region (e.g., `us-central-8`) |
+| `gpu_type` | string | Yes | `H100_SXM`, `H200_SXM`, `B200_SXM`, `H100_SXM_INF` |
+| `num_gpus` | integer | Yes | Number of GPUs (multiple of 8) |
+| `driver_version` | string | Yes | CUDA driver version |
+| `billing_type` | string | Yes | `ON_DEMAND` or `RESERVED` |
+| `cluster_type` | string | No | `KUBERNETES` or `SLURM` |
+| `duration_days` | integer | No | Reservation length (only with `RESERVED` billing) |
+| `volume_id` | string | No | Existing shared volume ID to attach |
+
+### List All Clusters
+
+```shell
+curl -X GET \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  https://api.together.ai/v1/compute/clusters
+```
+
+### Retrieve a Cluster
+
+```shell
+curl -X GET \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  https://api.together.ai/v1/compute/clusters/${CLUSTER_ID}
+```
+
+### Update / Scale a Cluster
+
+```shell
+curl -X PUT \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "num_gpus": 24,
+    "cluster_type": "KUBERNETES"
+  }' \
+  https://api.together.ai/v1/compute/clusters/${CLUSTER_ID}
+```
+
+Update request body fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `num_gpus` | integer | New GPU count (multiple of 8) |
+| `cluster_type` | string | `KUBERNETES` or `SLURM` |
+
+### Delete a Cluster
+
+```shell
+curl -X DELETE \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  https://api.together.ai/v1/compute/clusters/${CLUSTER_ID}
+```
+
+### List Regions
+
+```shell
+curl -X GET \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  https://api.together.ai/v1/compute/regions
+```
+
+### Create a Shared Volume
+
+```shell
+curl -X POST \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "volume_name": "my-shared-volume",
+    "size_tib": 2,
+    "region": "us-central-8"
+  }' \
+  https://api.together.ai/v1/compute/clusters/storage/volumes
+```
+
+Shared volume create request fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `volume_name` | string | Yes | Name of the volume |
+| `size_tib` | integer | Yes | Size in tebibytes |
+| `region` | string | Yes | Region name |
+
+### List Shared Volumes
+
+```shell
+curl -X GET \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  https://api.together.ai/v1/compute/clusters/storage/volumes
+```
+
+### Retrieve a Shared Volume
+
+```shell
+curl -X GET \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  https://api.together.ai/v1/compute/clusters/storage/volumes/${VOLUME_ID}
+```
+
+### Update a Shared Volume
+
+```shell
+curl -X PUT \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  --data '{
+    "volume_id": "12345-67890-12345-67890",
+    "size_tib": 3
+  }' \
+  https://api.together.ai/v1/compute/clusters/storage/volumes
+```
+
+### Delete a Shared Volume
+
+The volume must not be attached to any cluster.
+
+```shell
+curl -X DELETE \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  https://api.together.ai/v1/compute/clusters/storage/volumes/${VOLUME_ID}
 ```
 
 ## Terraform
