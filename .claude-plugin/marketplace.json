@@ -6,15 +6,7 @@
     "skills": [
       {
         "name": "together-chat-completions",
-        "description": "Serverless chat and text completion inference via Together AI's OpenAI-compatible API. Access 100+ open-source models with pay-per-token pricing."
-      },
-      {
-        "name": "together-function-calling",
-        "description": "Implement function calling (tool use) and structured outputs (JSON mode, json_schema, regex) via Together AI. 6 calling patterns from simple to multi-turn."
-      },
-      {
-        "name": "together-reasoning",
-        "description": "Use reasoning and thinking models on Together AI including DeepSeek R1, Kimi K2-Thinking, and Qwen3 with thinking mode."
+        "description": "Serverless chat and text completion inference via Together AI's OpenAI-compatible API. Access 100+ open-source models with pay-per-token pricing. Includes function calling (tool use), structured outputs (JSON mode, json_schema, regex), and reasoning/thinking models."
       },
       {
         "name": "together-images",

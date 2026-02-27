@@ -25,8 +25,6 @@ MARKETPLACE_PATH = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 # Skill ordering for consistent output
 SKILL_ORDER = [
     "together-chat-completions",
-    "together-function-calling",
-    "together-reasoning",
     "together-images",
     "together-video",
     "together-audio",
