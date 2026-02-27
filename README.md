@@ -16,50 +16,76 @@ Each skill contains:
 
 ## Skills Overview
 
+<!-- BEGIN_SKILLS_TABLE -->
 | Skill | Description | Scripts |
 |-------|-------------|---------|
-| **together-chat-completions** | Serverless chat/text completion with 100+ open-source models. Includes function calling, structured outputs (JSON mode, json_schema, regex), and reasoning models. | — |
-| **together-function-calling** | Function calling (tool use) and structured outputs. 6 calling patterns, parallel tool calls, json_schema with Pydantic. | `tool_call_loop.py` |
-| **together-reasoning** | Reasoning/thinking models — DeepSeek R1, Kimi K2, Qwen3. Extended thinking, reasoning_effort control, thought parsing. | — |
-| **together-images** | Image generation with FLUX.1/FLUX.2, Kontext (image editing), LoRA fine-tuned styles. URL and base64 output. | `generate_image.py` |
-| **together-video** | Video generation from text/image prompts. 15+ models including Veo 3, Sora 2, Kling 2.1. Async polling workflow. | `generate_video.py` |
-| **together-audio** | Text-to-speech (Orpheus, Kokoro, Cartesia) and speech-to-text (Whisper). REST, streaming, and WebSocket TTS modes. | `tts_generate.py`, `stt_transcribe.py` |
-| **together-embeddings** | Text embeddings (BGE, GTE, E5) and document reranking (Mxbai). Cosine similarity, batch processing. | `embed_and_rerank.py` |
-| **together-fine-tuning** | Fine-tune LLMs with LoRA, Full, DPO, and VLM tuning. Data upload, training, monitoring, and deployment. | `finetune_workflow.py` |
-| **together-batch-inference** | Async batch processing at up to 50% lower cost. Upload JSONL, create batch, poll, download results. | `batch_workflow.py` |
-| **together-evaluations** | LLM-as-a-Judge evaluation framework. Classify, Score, and Compare evaluation types. | `run_evaluation.py` |
-| **together-code-interpreter** | Execute Python in a sandboxed environment. Session reuse, package support, chart generation. | `execute_with_session.py` |
-| **together-code-sandbox** | Full VM sandboxes with Docker support via CodeSandbox. File I/O, port forwarding, persistent sessions. | — |
-| **together-dedicated-endpoints** | Single-tenant GPU endpoints. Create, autoscale, monitor, stop/delete. No rate limits, predictable latency. | `manage_endpoint.py` |
-| **together-dedicated-containers** | Deploy custom Docker containers on managed GPU infra. Sprocket SDK for workers, Jig CLI for deployment. | `sprocket_hello_world.py` |
-| **together-gpu-clusters** | Provision H100/H200/B200 GPU clusters. tcloud CLI, SLURM jobs, shared filesystem, multi-node training. | — |
+| **together-chat-completions** | Serverless chat and text completion inference via Together AI's OpenAI-compatible API. | — |
+| **together-function-calling** | Implement function calling (tool use) and structured outputs (JSON mode, json_schema, regex) via Together AI. | `tool_call_loop.py` |
+| **together-reasoning** | Use reasoning and thinking models on Together AI including DeepSeek R1, DeepSeek V3.1, Kimi K2-Thinking, and Qwen3 wi... | — |
+| **together-images** | Generate and edit images via Together AI's image generation API. | `generate_image.py` |
+| **together-video** | Generate videos from text and image prompts via Together AI. | `generate_video.py` |
+| **together-audio** | Text-to-speech (TTS) and speech-to-text (STT) via Together AI. | `stt_transcribe.py`, `tts_generate.py` |
+| **together-embeddings** | Generate text embeddings and rerank documents via Together AI. | `embed_and_rerank.py` |
+| **together-fine-tuning** | Fine-tune open-source LLMs on Together AI with LoRA, Full fine-tuning, DPO preference tuning, VLM (vision-language) f... | `finetune_workflow.py` |
+| **together-batch-inference** | Process large volumes of inference requests asynchronously at up to 50% lower cost via Together AI's Batch API. | `batch_workflow.py` |
+| **together-evaluations** | Evaluate LLM outputs using Together AI's LLM-as-a-Judge framework with Classify, Score, and Compare evaluation types. | `run_evaluation.py` |
+| **together-code-interpreter** | Execute Python code in a sandboxed environment via Together Code Interpreter (TCI). | `execute_with_session.py` |
+| **together-code-sandbox** | Spin up full VM sandboxes with Docker support via Together Code Sandbox (powered by CodeSandbox). | — |
+| **together-dedicated-endpoints** | Deploy models on dedicated single-tenant GPU endpoints via Together AI for predictable performance, no rate limits, a... | `manage_endpoint.py` |
+| **together-dedicated-containers** | Deploy custom Dockerized inference workloads on Together AI's managed GPU infrastructure using Dedicated Container In... | `sprocket_hello_world.py` |
+| **together-gpu-clusters** | Provision on-demand and reserved GPU clusters (Instant Clusters) on Together AI with H100, H200, and B200 hardware. | — |
+<!-- END_SKILLS_TABLE -->
 
 ## Installation
 
-### Install all skills
+### Claude Code (Plugin Marketplace)
+
+Install the full plugin or individual skills via the Claude Code plugin system:
+
+```bash
+# Install all skills
+/plugin marketplace add togethercomputer/skills
+
+# Install individual skills
+/plugin install together-chat-completions@togethercomputer/skills
+/plugin install together-function-calling@togethercomputer/skills
+```
+
+### Claude Code (Manual)
 
 Copy the skill folders into your project's `.claude/skills/` directory:
 
 ```bash
-# From the repo root
-cp -r together-skills/together-* your-project/.claude/skills/
+# From the repo root — all skills
+cp -r skills/together-* your-project/.claude/skills/
+
+# Or into your home directory for global availability
+cp -r skills/together-* ~/.claude/skills/
+
+# Or just the skills you need
+cp -r skills/together-chat-completions your-project/.claude/skills/
+cp -r skills/together-function-calling your-project/.claude/skills/
 ```
 
-Or into your home directory for global availability:
+### Codex
+
+Copy skills into the `.agents/skills/` directory:
 
 ```bash
-cp -r together-skills/together-* ~/.claude/skills/
+cp -r skills/together-* your-project/.agents/skills/
 ```
 
-### Install individual skills
+### Gemini CLI
 
-Copy only the skills you need:
+Install as a Gemini CLI extension:
 
 ```bash
-# Just chat completions and function calling
-cp -r together-skills/together-chat-completions your-project/.claude/skills/
-cp -r together-skills/together-function-calling your-project/.claude/skills/
+gemini extensions install https://github.com/togethercomputer/skills.git --consent
 ```
+
+### Cursor
+
+Install via the Cursor plugin flow using the `.cursor-plugin/` manifests included in this repository.
 
 ### Verify installation
 
