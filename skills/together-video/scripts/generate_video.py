@@ -38,7 +38,7 @@ def generate_image_to_video(image_base64: str):
         model="minimax/hailuo-02",
         width=1366,
         height=768,
-        fps=24,
+        fps=25,
         frame_images=[{"input_image": image_base64, "frame": 0}],
     )
     print(f"Submitted job: {job.id}")

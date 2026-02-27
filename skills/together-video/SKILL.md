@@ -9,7 +9,7 @@ description: Generate videos from text and image prompts via Together AI. 15+ mo
 
 Generate videos asynchronously — submit a job, poll for completion, download the result.
 
-- Endpoint: `/v1/videos/generations`
+- Endpoint: `/v2/videos`
 - Async workflow: create job → poll status → download video
 - 15+ models from Google, OpenAI, MiniMax, Kuaishou, ByteDance, PixVerse, Vidu
 
@@ -65,7 +65,7 @@ while (true) {
 
 ```shell
 # Create a video generation job
-curl -X POST "https://api.together.xyz/v1/videos" \
+curl -X POST "https://api.together.xyz/v2/videos" \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -76,7 +76,7 @@ curl -X POST "https://api.together.xyz/v1/videos" \
   }'
 
 # Poll for completion (replace $JOB_ID with the id from the create response)
-curl -X GET "https://api.together.xyz/v1/videos/$JOB_ID" \
+curl -X GET "https://api.together.xyz/v2/videos/$JOB_ID" \
   -H "Authorization: Bearer $TOGETHER_API_KEY"
 ```
 
@@ -123,7 +123,7 @@ while (true) {
 
 ```shell
 # Create an image-to-video job (replace $BASE64_IMAGE with your base64-encoded image)
-curl -X POST "https://api.together.xyz/v1/videos" \
+curl -X POST "https://api.together.xyz/v2/videos" \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -133,7 +133,7 @@ curl -X POST "https://api.together.xyz/v1/videos" \
   }'
 
 # Poll for completion (replace $JOB_ID with the id from the create response)
-curl -X GET "https://api.together.xyz/v1/videos/$JOB_ID" \
+curl -X GET "https://api.together.xyz/v2/videos/$JOB_ID" \
   -H "Authorization: Bearer $TOGETHER_API_KEY"
 ```
 
@@ -151,7 +151,7 @@ job = client.videos.create(
 
 | Parameter | Type | Description | Default |
 |-----------|------|-------------|---------|
-| `prompt` | string | Text description (required) | - |
+| `prompt` | string | Text description (required for all models except Kling) | - |
 | `model` | string | Model ID (required) | - |
 | `width` | int | Video width | 1366 |
 | `height` | int | Video height | 768 |
@@ -163,7 +163,8 @@ job = client.videos.create(
 | `negative_prompt` | string | What to exclude | - |
 | `frame_images` | array | Keyframe images (base64) | - |
 | `reference_images` | array | Style reference URLs | - |
-| `output_format` | string | "MP4" or "GIF" | "MP4" |
+| `output_format` | string | "MP4" or "WEBM" | "MP4" |
+| `output_quality` | int | Bitrate/quality (lower = higher quality) | 20 |
 
 ## Job Status Flow
 
