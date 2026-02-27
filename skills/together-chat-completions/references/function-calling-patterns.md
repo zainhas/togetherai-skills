@@ -252,6 +252,7 @@ final = client.chat.completions.create(
 | Value | Behavior |
 |-------|----------|
 | `"auto"` (default) | Model decides whether to call functions |
+| `"required"` | Model must call at least one function |
 | `"none"` | Never call functions |
 | `{"type": "function", "function": {"name": "fn"}}` | Force specific function |
 

@@ -139,7 +139,7 @@ asyncio.run(main())
 | `model` | string | Model ID (required) |
 | `messages` | array | Conversation messages with `role` and `content` (required for chat) |
 | `max_tokens` | int | Max tokens to generate |
-| `temperature` | float | Sampling temperature (0-2, default ~0.7) |
+| `temperature` | float | Sampling temperature (0-1, default ~0.7) |
 | `top_p` | float | Nucleus sampling threshold (0-1) |
 | `top_k` | int | Top-k sampling |
 | `repetition_penalty` | float | Penalize repeated tokens (>1.0 = more penalty) |
@@ -331,6 +331,7 @@ curl -X POST "https://api.together.xyz/v1/chat/completions" \
 ### tool_choice Parameter
 
 - `"auto"` (default): Model decides whether to call functions
+- `"required"`: Model must call at least one function
 - `"none"`: Never call functions
 - `{"type": "function", "function": {"name": "fn_name"}}`: Force specific function
 
@@ -432,7 +433,11 @@ response = client.chat.completions.create(
 
 ## Reasoning Models
 
-Reasoning models think step-by-step before answering, outputting chain-of-thought in `<think>` tags. Best for complex math, code, planning, and logic tasks.
+Reasoning models think step-by-step before answering. Best for complex math, code, planning, and logic tasks.
+
+**How reasoning output is returned:**
+- **Most reasoning models** (Kimi K2.5, GLM-5, GPT-OSS, Qwen3 Thinking, etc.) return reasoning in a separate `reasoning` field: `response.choices[0].message.reasoning`
+- **DeepSeek R1** is a special case that outputs reasoning inside `<think>` tags within the `content` field
 
 ### Quick Start
 
@@ -488,9 +493,15 @@ Let me compare 9.9 and 9.11...
 | Model | API String | Strengths |
 |-------|-----------|-----------|
 | DeepSeek R1 | `deepseek-ai/DeepSeek-R1` | Math, code, complex reasoning |
-| DeepSeek V3.1 | `deepseek-ai/DeepSeek-V3-0324` | General + reasoning |
+| DeepSeek V3.1 | `deepseek-ai/DeepSeek-V3.1` | General + reasoning |
+| GPT-OSS 120B | `openai/gpt-oss-120b` | Reasoning only (adjustable effort) |
+| GPT-OSS 20B | `openai/gpt-oss-20b` | Reasoning only (adjustable effort) |
 | Kimi K2 Thinking | `moonshotai/Kimi-K2-Thinking` | Extended reasoning |
+| Kimi K2.5 | `moonshotai/Kimi-K2.5` | Hybrid (reasoning + general) |
+| GLM-5 | `zai-org/GLM-5` | Hybrid |
+| MiniMax M2.5 | `MiniMaxAI/MiniMax-M2.5` | Reasoning only |
 | Qwen3 235B Thinking | `Qwen/Qwen3-235B-A22B-Thinking-2507` | Thinking mode |
+| Qwen3.5 397B | `Qwen/Qwen3.5-397B-A17B` | Hybrid |
 | QwQ 32B | `Qwen/QwQ-32B` | Compact reasoning |
 | R1 Distill Llama 70B | `deepseek-ai/DeepSeek-R1-Distill-Llama-70B` | Distilled reasoning |
 | R1 Distill Qwen 14B | `deepseek-ai/DeepSeek-R1-Distill-Qwen-14B` | Compact distilled |
@@ -501,7 +512,7 @@ Control how much thinking the model does (`"low"`, `"medium"`, `"high"`):
 
 ```python
 response = client.chat.completions.create(
-    model="deepseek-ai/DeepSeek-R1",
+    model="openai/gpt-oss-120b",
     messages=[{"role": "user", "content": "Prove the infinitude of primes"}],
     reasoning_effort="high",
 )
@@ -512,7 +523,7 @@ import Together from "together-ai";
 const together = new Together();
 
 const stream = await together.chat.completions.create({
-  model: "deepseek-ai/DeepSeek-R1",
+  model: "openai/gpt-oss-120b",
   messages: [{ role: "user", content: "Prove the infinitude of primes" }],
   reasoning_effort: "high",
   stream: true,
@@ -528,7 +539,7 @@ curl -X POST "https://api.together.xyz/v1/chat/completions" \
   -H "Authorization: Bearer $TOGETHER_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "deepseek-ai/DeepSeek-R1",
+    "model": "openai/gpt-oss-120b",
     "messages": [
       {"role": "user", "content": "Prove the infinitude of primes"}
     ],
@@ -543,7 +554,22 @@ Toggle thinking on/off by choosing the model variant:
 - **Thinking enabled:** `Qwen/Qwen3-235B-A22B-Thinking-2507`
 - **Thinking disabled (faster, cheaper):** `Qwen/Qwen3-235B-A22B-Instruct-2507-tput`
 
-### Parse Thinking vs Answer
+### Accessing Reasoning Output
+
+**Most models (Kimi K2.5, GLM-5, GPT-OSS, Qwen3, etc.) -- use the `reasoning` field:**
+
+```python
+response = client.chat.completions.create(
+    model="openai/gpt-oss-120b",
+    messages=[{"role": "user", "content": "Which is bigger: 9.9 or 9.11?"}],
+)
+reasoning = response.choices[0].message.reasoning  # step-by-step thinking
+answer = response.choices[0].message.content         # final answer
+print(f"Reasoning: {reasoning}")
+print(f"Answer: {answer}")
+```
+
+**DeepSeek R1 -- parse `<think>` tags from `content`:**
 
 ```python
 import re

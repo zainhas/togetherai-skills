@@ -139,7 +139,7 @@ response = client.chat.completions.create(
 )
 
 # Phone number
-response_format={"type": "regex", "regex": r"\(\d{3}\) \d{3}-\d{4}"}
+response_format={"type": "regex", "pattern": r"\(\d{3}\) \d{3}-\d{4}"}
 
 # Email
 response_format={"type": "regex", "pattern": r"\w+@\w+\.com\n"}
