@@ -2,7 +2,7 @@
 
 A collection of 13 agent skills that provide comprehensive knowledge of the [Together AI](https://together.ai) platform — inference, training, embeddings, audio, video, images, function calling, and infrastructure.
 
-Each skill teaches AI coding agents how to use a specific Together AI product, including API patterns, SDK usage, model selection, and best practices. Skills include runnable Python scripts using the **Together Python v2 SDK**.
+Each skill teaches AI coding agents how to use a specific Together AI product, including API patterns, SDK usage (Python and TypeScript), CLI commands, direct API usage, model selection, and best practices. Skills include runnable Python scripts (using the **Together Python v2 SDK**), TypeScript examples, and CLI/API workflow guidance.
 
 Compatible with **Claude Code**, **Cursor**, **Codex**, and **Gemini CLI**.
 
