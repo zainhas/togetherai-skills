@@ -67,6 +67,61 @@ response2 = client.code_interpreter.execute(
 # Output: stdout: x = 42
 ```
 
+```typescript
+import Together from 'together-ai';
+
+const client = new Together();
+
+// Run the first session
+const response1 = await client.codeInterpreter.execute({
+  code: 'x = 42',
+  language: 'python',
+});
+
+if (response1.errors) {
+  console.log(`Response 1 errors: ${response1.errors}`);
+} else {
+  // Save the session_id
+  const sessionId = response1.data.session_id;
+
+  // Reuse the first session
+  const response2 = await client.codeInterpreter.execute({
+    code: 'print(f"The value of x is {x}")',
+    language: 'python',
+    session_id: sessionId,
+  });
+
+  if (response2.errors) {
+    console.log(`Response 2 errors: ${response2.errors}`);
+  } else {
+    for (const output of response2.data.outputs) {
+      console.log(`${output.type}: ${output.data}`);
+    }
+  }
+}
+```
+
+```shell
+# First call — creates a session
+curl -X POST "https://api.together.ai/tci/execute" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "language": "python",
+    "code": "x = 42"
+  }'
+
+# Second call — reuse session_id from the first response
+curl -X POST "https://api.together.ai/tci/execute" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "language": "python",
+    "code": "print(f\"The value of x is {x}\")",
+    "session_id": "YOUR_SESSION_ID_FROM_FIRST_RESPONSE"
+  }'
+```
+
 ### Upload Files
 
 ```python
@@ -77,6 +132,47 @@ response = client.code_interpreter.execute(
     language="python",
     files=[script_file],
 )
+```
+
+```typescript
+import Together from 'together-ai';
+
+const client = new Together();
+
+const scriptContent = "import sys\nprint(f'Hello from inside {sys.argv[0]}!')";
+
+const scriptFile = {
+  name: "myscript.py",
+  encoding: "string",
+  content: scriptContent,
+};
+
+const response = await client.codeInterpreter.execute({
+  code: "!python myscript.py",
+  language: "python",
+  files: [scriptFile],
+});
+
+for (const output of response.data.outputs) {
+  console.log(`${output.type}: ${output.data}`);
+}
+```
+
+```shell
+curl -X POST "https://api.together.ai/tci/execute" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "language": "python",
+    "files": [
+      {
+        "name": "myscript.py",
+        "encoding": "string",
+        "content": "import sys\nprint(f'"'"'Hello from inside {sys.argv[0]}!'"'"')"
+      }
+    ],
+    "code": "!python myscript.py"
+  }'
 ```
 
 ### Install Packages
