@@ -65,7 +65,7 @@ Markdown files in `references/` are loaded on demand when the agent needs deeper
 
 ### Scripts
 
-Python files in `scripts/` are runnable examples demonstrating complete workflows. All scripts in this repo use the **Together Python v2 SDK** (`together>=1.0.0`).
+Python files in `scripts/` are runnable examples demonstrating complete workflows. All scripts in this repo use the **Together Python v2 SDK** (`together>=2.0.0`).
 
 ## Code conventions
 
