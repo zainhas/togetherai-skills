@@ -8,6 +8,7 @@
 | Reasoning | Kimi K2.5 (thinking) | `moonshotai/Kimi-K2.5` | `deepseek-ai/DeepSeek-R1` |
 | Coding Agents | Kimi K2.5 (thinking) | `moonshotai/Kimi-K2.5` | `Qwen/Qwen3-Coder-480B-A35B-Instruct-FP8`, `deepseek-ai/DeepSeek-V3.1` |
 | Small & Fast | GPT-OSS 20B | `openai/gpt-oss-20b` | `Qwen/Qwen2.5-7B-Instruct-Turbo` |
+| Low Latency / Real-time | Qwen 2.5 7B Turbo | `Qwen/Qwen2.5-7B-Instruct-Turbo` | `openai/gpt-oss-20b`. For voice agents and streaming use cases, prefer small models — large models (235B+) have high cold-start latency. |
 | Medium General | GPT-OSS 120B | `openai/gpt-oss-120b` | `zai-org/GLM-4.5-Air-FP8` |
 | Function Calling | GLM-5 | `zai-org/GLM-5` | `moonshotai/Kimi-K2.5` |
 | Vision | Kimi K2.5 | `moonshotai/Kimi-K2.5` | `meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8` |
