@@ -41,11 +41,34 @@
 | Qwen | Qwen 2.5 7B Turbo | `Qwen/Qwen2.5-7B-Instruct-Turbo` | 32,768 | FP8 |
 | Essential AI | Rnj-1 Instruct | `essentialai/rnj-1-instruct` | 32,768 | BF16 |
 
+## Discovering Available Models
+
+The catalog above is a snapshot. Models are added and removed frequently, and not all models are available serverless on every account. To get the current list of serverless models at runtime:
+
+```bash
+curl "https://api.together.ai/v1/models?serverless=true" \
+  -H "Authorization: Bearer $TOGETHER_API_KEY"
+```
+
+The `?serverless=true` query parameter filters to models you can call immediately without a dedicated endpoint. This is especially important for vision models, where availability changes often.
+
+Each model object has a `type` field (`chat`, `image`, `audio`, `transcribe`, `video`, `embedding`, `moderation`) which you can filter client-side. The `type` query parameter is not supported server-side — only `serverless` filters on the API.
+
+Note: the Python SDK's `client.models.list()` does not support the `serverless` filter — use the REST endpoint directly or `httpx`/`requests`.
+
 ## Vision Models
+
+Many vision-capable models require a dedicated endpoint and are not available serverless. The API has no `type=vision` filter — vision models appear as `type=chat`. To find which models support vision:
+
+1. Query serverless models: `GET /v1/models?serverless=true`
+2. Try a cheap vision probe (tiny image, `max_tokens=10`) against candidates — models that don't support images will return an error immediately.
+
+Do NOT assume models from the table below are serverless — always verify with the API first.
 
 | Organization | Model | API String | Context |
 |-------------|-------|-----------|---------|
 | Moonshot | Kimi K2.5 | `moonshotai/Kimi-K2.5` | 262,144 |
+| Moonshot | Kimi K2.6 | `moonshotai/Kimi-K2.6` | 262,144 |
 | Meta | Llama 4 Maverick | `meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8` | 524,288 |
 | Qwen | Qwen3-VL-8B | `Qwen/Qwen3-VL-8B-Instruct` | 262,100 |
 
