@@ -71,7 +71,7 @@ Many vision-capable models require a dedicated endpoint and are not available se
 
 Do NOT assume models from the table below are serverless — always verify with the API first.
 
-**Kimi K2.5/K2.6 gotcha:** These models default to reasoning mode. For vision tasks like image description, reasoning often consumes the token budget, returning empty or truncated content. Disable it with `reasoning={"enabled": False}` for reliable results.
+**Kimi K2.5/K2.6 and reasoning mode:** These models default to reasoning mode, which uses part of the `max_tokens` budget for internal thinking before producing visible content. If `max_tokens` is too low (e.g. 300), reasoning may consume the entire budget, returning empty or truncated content. Either set `max_tokens` high (1000+) to leave room for both reasoning and output, or disable reasoning with `reasoning={"enabled": False}` for tasks like simple image descriptions where reasoning isn't needed.
 
 | Organization | Model | API String | Context |
 |-------------|-------|-----------|---------|
