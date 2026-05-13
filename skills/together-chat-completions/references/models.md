@@ -71,6 +71,8 @@ Many vision-capable models require a dedicated endpoint and are not available se
 
 Do NOT assume models from the table below are serverless — always verify with the API first.
 
+**Kimi K2.5/K2.6 gotcha:** These models default to reasoning mode. For vision tasks like image description, reasoning consumes the entire token budget and returns empty content. Disable it with `reasoning={"enabled": False}` or set `max_tokens` high (500+) to leave room for visible output after reasoning.
+
 | Organization | Model | API String | Context |
 |-------------|-------|-----------|---------|
 | Moonshot | Kimi K2.5 | `moonshotai/Kimi-K2.5` | 262,144 |
