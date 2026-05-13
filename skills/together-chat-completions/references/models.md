@@ -54,7 +54,13 @@ The `?serverless=true` query parameter filters to models you can call immediatel
 
 Each model object has a `type` field (`chat`, `image`, `audio`, `transcribe`, `video`, `embedding`, `moderation`) which you can filter client-side. The `type` query parameter is not supported server-side — only `serverless` filters on the API.
 
-Note: the Python SDK's `client.models.list()` does not support the `serverless` filter — use the REST endpoint directly or `httpx`/`requests`.
+In the Python SDK, use `extra_query` to pass the serverless filter:
+
+```python
+from together import Together
+client = Together()
+serverless_models = client.models.list(extra_query={"serverless": "true"})
+```
 
 ## Vision Models
 
