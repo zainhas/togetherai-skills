@@ -41,6 +41,11 @@ clearly offline batch processing, vector retrieval, model training, or infrastru
 - **Basic chat, streaming, or multi-turn state**
   - Start with [references/api-parameters.md](references/api-parameters.md)
   - Use [scripts/chat_basic.py](scripts/chat_basic.py) or [scripts/chat_basic.ts](scripts/chat_basic.ts)
+- **Hybrid reasoning models or empty `message.content` risks**
+  - Read [references/reasoning-models.md](references/reasoning-models.md) before writing code
+  - If a hybrid model such as `Qwen/Qwen3.5-9B` should return a direct answer in `message.content`,
+    especially with `max_tokens` set low, disable reasoning with `reasoning={"enabled": False}`
+    unless the user explicitly asked for reasoning output
 - **OpenAI SDK migration, rate limits, or debug headers**
   - Read [references/api-parameters.md](references/api-parameters.md)
   - Use [scripts/debug_headers.py](scripts/debug_headers.py) or [scripts/debug_headers.ts](scripts/debug_headers.ts)
@@ -79,6 +84,10 @@ clearly offline batch processing, vector retrieval, model training, or infrastru
 - For tools, implement the full loop: model tool call -> execute tool -> append tool result -> second model call.
 - Prefer `json_schema` over looser JSON modes when the user needs stable machine-readable output.
 - Use reasoning models only when the task benefits from deeper deliberation; otherwise prefer cheaper standard models.
+- Some hybrid reasoning models, including Qwen3.5 models, have reasoning on by default. For
+  direct-response or low-latency tasks that read `response.choices[0].message.content`, pass
+  `reasoning={"enabled": False}` so the answer lands in `content` instead of spending the small
+  token budget on reasoning.
 - To combine tool calling with structured output, use a two-phase approach: Phase 1 sends `tools` (no `response_format`), Phase 2 sends `response_format` (no `tools`) after tool results are appended.
 - Streaming works with `response_format`; accumulate chunks and parse the final concatenated string as JSON.
 - If the user needs many independent requests, combine this skill with `async_parallel.py` or hand off to batch inference.
